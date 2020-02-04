@@ -150,7 +150,7 @@ end
 
 
 """
-`coarse_transition_matrix`: Contruct a transition matrix amongst the bins (serial version).
+`build_coarse_transition_matrix`: Contruct a transition matrix amongst the bins (serial version).
 
 ### Arguments
 * `mutation!` - an in place mutation function
@@ -160,7 +160,7 @@ end
 * `n_bins` - total number of bins
 * `n_samples` - number of trials for each sample
 """
-function coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
+function build_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
 
    X = similar(x0_vals[1]);
    T = zeros(Float64, n_bins, n_bins);
@@ -177,7 +177,7 @@ function coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins,
 end
 
 """
-`coarse_transition_matrix_parallel`: Contruct a transition matrix amongst the
+`build_coarse_transition_matrix_parallel`: Contruct a transition matrix amongst the
 bins in parallel.  It assumed that a pool of workers has already been
 contructed.
 
@@ -189,7 +189,7 @@ contructed.
 * `n_bins` - total number of bins
 * `n_samples` - number of trials for each sample
 """
-function coarse_transition_matrix_parallel(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
+function build_coarse_transition_matrix_parallel(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
 
     T = SharedArray{Float64}(n_bins,n_bins);
     X = similar(x0_vals[1]);
@@ -209,7 +209,7 @@ function coarse_transition_matrix_parallel(mutation!, bin_id, x0_vals, bin0_vals
 end
 
 """
-`value_vectors`: Assemble the value vectors associated with argument `u` for `n`
+`build_value_vectors`: Assemble the value vectors associated with argument `u` for `n`
 steps with bin transition matrix `T`
 
 ### Arguments
@@ -218,7 +218,7 @@ steps with bin transition matrix `T`
 * `u` - quantity of interest vector on the bin space
 * `tol` - tolerance for negative values which may appear due to roundoff
 """
-function value_vectors(n, T, u; tol=1e-15)
+function build_value_vectors(n, T, u; tol=1e-15)
    n_bins = length(u);
    vvals = zeros(n_bins,n);
 

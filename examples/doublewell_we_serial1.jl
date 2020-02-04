@@ -35,11 +35,11 @@ Random.seed!(100);
 x0_vals = copy(voronoi_pts);
 bin0_vals = bin_id.(voronoi_pts);
 n_bins = length(B₀);
-T = JuWeightedEnsemble.coarse_transition_matrix(mutation!, bin_id, x0_vals,bin0_vals, n_bins, n_samples_per_bin);
+T = JuWeightedEnsemble.build_coarse_transition_matrix(mutation!, bin_id, x0_vals,bin0_vals, n_bins, n_samples_per_bin);
 
 # define coarse observable as a bin function
 F = f.(voronoi_pts);
-value_vectors = JuWeightedEnsemble.value_vectors(n_we_steps,T,Float64.(F));
+value_vectors = JuWeightedEnsemble.build_value_vectors(n_we_steps,T,Float64.(F));
 
 # set up ensemble
 ξ₀ = [[a] for i = 1:n_particles];
