@@ -1,22 +1,17 @@
 #=
-Parallel WE estimation of the probability of for a diffusion with X(0) = a
-satisfying X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
-
-Either run as julia -p 4 doublewell_we_par1.jl or uncomment addprocs below.
+WE estimation of the probability of for a diffusion with X(0) = a satisfying
+X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
 =#
 
-using Distributed
+
 using StatsBase
 using HypothesisTests
 using Printf
+using NearestNeighbors
 
-# addprocs(4);
-
-@everywhere using NearestNeighbors
-
-@everywhere include("doublewell_setup.jl");
-@everywhere push!(LOAD_PATH,"../src/");
-@everywhere using JuWeightedEnsemble
+include("doublewell_setup.jl");
+push!(LOAD_PATH,"../../src/");
+using JuWeightedEnsemble
 
 # number of coarse steps in WE
 n_we_steps = 10;
@@ -28,20 +23,20 @@ n_samples_per_bin = 10^2;
 n_particles = 10^2;
 
 # define bin structure
-@everywhere voronoi_pts = [[x] for x in LinRange(a-.1,b+.1,21)];
+voronoi_pts = [[x] for x in LinRange(a-.1,b+.1,21)];
 B₀ = JuWeightedEnsemble.Voronoi_to_Bins(voronoi_pts);
-@everywhere tree = KDTree(hcat(voronoi_pts...));
+tree = KDTree(hcat(voronoi_pts...));
 
 # define the mutation mapping
-@everywhere mutation = x-> MALA(x, V, gradV!, β, Δt, nΔt_coarse, return_trajectory=false)[1];
-@everywhere mutation! = x-> MALA!(x, V, gradV!, β, Δt, nΔt_coarse);
+mutation = x-> MALA(x, V, gradV!, β, Δt, nΔt_coarse, return_trajectory=false)[1];
+mutation! = x-> MALA!(x, V, gradV!, β, Δt, nΔt_coarse);
 # define bin id mapping
-@everywhere bin_id = x-> JuWeightedEnsemble.Voronoi_bin_id(x,tree);
+bin_id = x-> JuWeightedEnsemble.Voronoi_bin_id(x,tree);
 Random.seed!(100);
 x0_vals = copy(voronoi_pts);
 bin0_vals = bin_id.(voronoi_pts);
 n_bins = length(B₀);
-T = JuWeightedEnsemble.build_coarse_transition_matrix_parallel(mutation!, bin_id, x0_vals,bin0_vals, n_bins, n_samples_per_bin);
+T = JuWeightedEnsemble.build_coarse_transition_matrix(mutation!, bin_id, x0_vals,bin0_vals, n_bins, n_samples_per_bin);
 
 # define coarse observable as a bin function
 F = f.(voronoi_pts);
@@ -60,6 +55,6 @@ JuWeightedEnsemble.update_bin_weights!(B₀, E₀);
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-JuWeightedEnsemble.run_we_parallel!(E, B, mutation,bin_id, JuWeightedEnsemble.Systematic, value_vectors, n_we_steps);
+JuWeightedEnsemble.run_we!(E, B, mutation,bin_id, JuWeightedEnsemble.Systematic, value_vectors, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)

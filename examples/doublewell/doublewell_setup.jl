@@ -5,7 +5,8 @@ a satisfying X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
 
 using LinearAlgebra
 using Random
-push!(LOAD_PATH, "../../JuBasicMD/src")
+# adjust this path as neccessary
+push!(LOAD_PATH, "../../../JuBasicMD/src")
 using JuBasicMD: MALA,MALA!
 
 function V(X)
