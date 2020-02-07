@@ -24,6 +24,8 @@ More details on the algorithm are described in the references below.    In parti
 
 * The double well potential in dimension one, where we estimate the probability of moving from the point -1 in the left basin to the right basin in a specified amount of time.  The underlying dynamic in this version is the discretized overdamped Langevin equation.
 
+* The Muller potential, where we estimate the probability of moving from one minimum to another in a specified time.  This version uses the overdamped Langevin equation.
+
 # Caveats
 
 * This version only includes optimal allocation
