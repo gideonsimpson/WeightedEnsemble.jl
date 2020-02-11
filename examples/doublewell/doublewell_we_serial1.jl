@@ -46,8 +46,8 @@ F = f.(voronoi_pts);
 value_vectors = JuWeightedEnsemble.build_value_vectors(n_we_steps,T,float.(F));
 
 #  define selection function
-# selection! = (E, B, j)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,value_vectors,j)
-selection! = (E, B, j)-> JuWeightedEnsemble.uniform_selection!(E,B);
+selection! = (E, B, j)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,value_vectors,j)
+# selection! = (E, B, j)-> JuWeightedEnsemble.uniform_selection!(E,B);
 
 # set up ensemble
 ξ₀ = [copy(x₀) for i = 1:n_particles];

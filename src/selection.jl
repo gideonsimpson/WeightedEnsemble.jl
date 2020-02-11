@@ -59,15 +59,16 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, value_vectors,j; re
 
    # find target number of offspring for the bins based on
    # bin weights
-   R = count(B.n .>0); # count number of bins which must have offspring
+   non_empty_bins = findall(n->n>0, B.n);
+   R = length(non_empty_bins); # count number of bins which must have offspring
    B.target .= (B.n .>0) .+ resample(n_particles-R, (B.ν .* value_vectors[j])/(B.ν ⋅ value_vectors[j]));
 
    # compute number of offspring of each particle bin by bin
-   for i in 1:n_bins
+   for p in non_empty_bins
       # get particle indices for bin i
-      particle_ids = findall(isequal(i), E.bin);
+      particle_ids = findall(isequal(p), E.bin);
       if !isempty(particle_ids)
-         E.offspring[particle_ids] = resample(B.target[i], E.ω[particle_ids]/B.ν[i]);
+         E.offspring[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
       end
    end
 
@@ -94,32 +95,36 @@ positive bin weight has at least one offspring.
 * `B` - bin data structure
 * `resample` - resampling scheme
 """
-function uniform_selection!(E::Ensemble, B::Bins)
+function uniform_selection!(E::Ensemble, B::Bins; resample=Systematic)
    n_particles = length(E);
    n_bins = length(B);
    # zero out offspring counts
    @. E.offspring = 0;
 
-   # ensure each bin with walkers has at lesat one offspring
-   R = count(B.n .>0); 
-   for i in 1:n_bins
+   # ensure each bin with walkers has at least one offspring
+   non_empty_bins = findall(n->n>0, B.n);
+   R = length(non_empty_bins);
+   B.target[non_empty_bins] .= 1 .+ resample(n_particles-R, [1.0/R for j in 1:R]);
+
+   # compute number of offspring of each particle bin by bin
+   for p in non_empty_bins
       # get particle indices for bin i
-      particle_ids = findall(isequal(i), E.bin);
+      particle_ids = findall(isequal(p), E.bin);
       if !isempty(particle_ids)
-         E.offspring[particle_ids] .= rand(Multinomial(1,length(particle_ids)));
+         E.offspring[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
       end
    end
-   # allocate the other walkers n_partilces - R walkers
-   E.offspring .+= rand(Multinomial(n_particles-R, n_particles));
+
    # resample the particles
    n_spawned = 0;
    for i in 1:n_particles
+      # identify the bin of the current particle
+      bin = E.bin[i];
       for k in 1:E.offspring[i]
          E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
-         E.ω̂[k+n_spawned] = E.ω[i]/E.offspring[i];
+         E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
       end
       n_spawned += E.offspring[i];
    end
-   E.ω̂ .= E.ω̂/sum(E.ω̂);
    E, B
 end
