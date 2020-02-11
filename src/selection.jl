@@ -52,6 +52,9 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, value_vectors,j; re
 
    n_particles = length(E);
    n_bins = length(B);
+   # zero out offspring counts
+   @. E.offspring = 0;
+   @. B.target = 0;
 
    if(B.ν ⋅ value_vectors[j] <= 0)
       throw(DomainError(j,"Bin Weights ⟂ Value Vector"));
@@ -100,6 +103,7 @@ function uniform_selection!(E::Ensemble, B::Bins; resample=Systematic)
    n_bins = length(B);
    # zero out offspring counts
    @. E.offspring = 0;
+   @. B.target = 0;
 
    # ensure each bin with walkers has at least one offspring
    non_empty_bins = findall(n->n>0, B.n);
