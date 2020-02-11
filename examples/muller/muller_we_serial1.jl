@@ -52,6 +52,7 @@ T = JuWeightedEnsemble.build_coarse_transition_matrix(mutation!, bin_id, x0_vals
 # define coarse observable as a bin function
 F = f.(voronoi_pts);
 value_vectors = JuWeightedEnsemble.build_value_vectors(n_we_steps,T,float.(F));
+selection! = (E, B, j)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,value_vectors,j)
 
 # set up ensemble
 ξ₀ = [copy(x₀) for i = 1:n_particles];
@@ -66,6 +67,6 @@ JuWeightedEnsemble.update_bin_weights!(B₀, E₀);
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-JuWeightedEnsemble.run_we!(E, B, mutation,bin_id, JuWeightedEnsemble.Systematic, value_vectors, n_we_steps);
+JuWeightedEnsemble.run_we!(E, B, mutation,selection!, bin_id, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)

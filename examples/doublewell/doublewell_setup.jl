@@ -18,6 +18,7 @@ function gradV!(gradV, X)
 end
 
 a = -1.0;   # starting point
+x₀ = [a];
 b = 0.5;    # target set, (b, ∞)
 Δt = 1e-4;  # time step
 β = 5.0;    # inverse temperature

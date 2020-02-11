@@ -13,7 +13,7 @@ Random.seed!(100);
 n_trials = 10^4;
 n_in_set = 0;
 for j in 1:n_trials
-    X = [a];
+    X = copy(x₀);
     MALA!(X, V, gradV!, β, Δt, nΔt);
     global n_in_set+= f(X);
 end

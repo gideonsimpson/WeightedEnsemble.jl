@@ -12,9 +12,9 @@ The key functions and data structures that must be provided by the user are:
 * An initial ensemble, stored in the `Ensemble` data structure, with initial particle positions and weights.
 * A list of of bins, stored in the `Bins` data structure, together with a `bin_id` function that uniquely maps positions in state to one of the bins.  
 * A `mutation` function which evolves particles under the underlying, unbiased, dynamic
-* Value vectors, `value_vectors`, and a resampling function (`Systematic`, `Residual`, and `Stratified` are included) to guide the selection process.
-
-The value vectors can be constructed by building up a bin to bin coarse Markov model, estimating the QoI when restricted to the bins, and then using the included `build_value_vectors`.  A coarse Markov model can be constructed with the included `build_coarse_transition_matrix`
+* A `selection!` function, which selects which particles to produce offspring before performuing the `mutation`.  Two selection schemes are currently included:
+    * `uniform_selection` - This uniformly samples from the particles, ensuring that there is at least one particle spawned from a bin which is non-empty.
+    * `optimal_allocation_selection!` - This uses a coarse scale model and a quantity of interest to allocate particles in a way that minimizes mutation variance.  To use it, it is necessary to construct "value vectors". These value vectors can be constructed by building up a bin to bin coarse Markov model, estimating the QoI when restricted to the bins, and then using the included `build_value_vectors`.  A coarse Markov model can be constructed with the included `build_coarse_transition_matrix`.
 
 Parallel versions of the construction of the coarse transition matrix and the actual WE are also included.  These distribute the work of the mutation step, usually the most costly, and an inherently independent computation, across workers.  
 
@@ -33,12 +33,10 @@ Langevin equation.
 
 # Caveats
 
-* This version only includes optimal allocation
 * The mutation step in the provided examples make use of [`JuBasicMD`](https://github.com/gideonsimpson/JuBasicMD)
 
 # TO DO
 
-* Support uniform allocation, if only for comparison
 * Provide examples of steady state (reaction rate) problems
 * Provide additional examples
 
