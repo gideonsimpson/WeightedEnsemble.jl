@@ -54,13 +54,25 @@ selection! = (E, B, j)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,va
 
 E₀ = Ensemble{Array{Float64,1}, Float64, Int}(copy(ξ₀),copy(ξ₀),copy(ω₀), copy(ω₀),
                             zeros(Int, n_particles),zeros(Int, n_particles));
-@. E₀.bin =bin_id(E₀.ξ);
-JuWeightedEnsemble.update_bin_weights!(B₀, E₀);
+
+# define the rebinning function
+function rebin!(E, B, t)
+    @. E.bin = bin_id(E.ξ);
+    JuWeightedEnsemble.update_bin_weights!(B, E);
+    E, B
+end
+
+rebin!(E₀, B₀, 0);
+
+
+#
+# @. E₀.bin =bin_id(E₀.ξ);
+# JuWeightedEnsemble.update_bin_weights!(B₀, E₀);
 
 # run
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-JuWeightedEnsemble.prun_we!(E, B, mutation,selection!, bin_id, n_we_steps);
+JuWeightedEnsemble.prun_we!(E, B, mutation,selection!, rebin!, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)
