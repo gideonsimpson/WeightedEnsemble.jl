@@ -56,10 +56,6 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Syst
    @. E.offspring = 0;
    @. B.target = 0;
 
-   # zero out offspring counts
-   @. E.offspring = 0;
-   @. B.target = 0;
-
    # identify nonempty bins
    non_empty_bins = findall(n->n>0, B.n);
    R = length(non_empty_bins);
