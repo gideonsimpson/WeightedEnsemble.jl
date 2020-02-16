@@ -33,12 +33,11 @@ include("selection.jl")
 """
 function build_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
 
-   # X = similar(x0_vals[1]);
-   X = deepcopy(x0_vals[1]); # needed to handle tuple types
+   X = similar(x0_vals[1]);
    T = zeros(Float64, n_bins, n_bins);
 
    for k in 1:n_samples, l in 1:length(x0_vals)
-      X .= copy(x0_vals[l]);
+      X .= deepcopy(x0_vals[l]);
       i = bin0_vals[l];
       mutation!(X);
       j = bin_id(X);
@@ -64,13 +63,12 @@ contructed.
 function pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
 
     T = SharedArray{Float64}(n_bins,n_bins);
-    #X = similar(x0_vals[1]);
-    X = deepcopy(x0_vals[1]); # needed to handle tuple types
+    X = similar(x0_vals[1]);
     @. T  = 0.0;
 
     @sync @distributed for k in 1:n_samples
         for l in 1:length(x0_vals)
-            X .= copy(x0_vals[l]);
+            X .= deepcopy(x0_vals[l]);
             i = bin0_vals[l];
             mutation!(X);
             j = bin_id(X);
