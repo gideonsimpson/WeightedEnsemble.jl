@@ -38,17 +38,17 @@ end
 
 
 """
-`optimal_allocation_selection!`: Select particles according to the bins, using
-the value vectors for optimal allocation.
+`optimal_allocation_selection!`: Optimally particles according to the bins,
+using a value function to approximate mutation variance.
 
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
-* `𝒱` - mutation variance estimator 
-* `j` - j-th seletion step
+* `h` - value function estimator
+* `t` - t-th seletion step
 * `resample` - resampling scheme
 """
-function optimal_allocation_selection!(E::Ensemble, B::Bins, 𝒱, t; resample=Systematic)
+function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Systematic)
 
    n_particles = length(E);
    n_bins = length(B);
@@ -64,7 +64,7 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, 𝒱, t; resample=S
 
    for p in non_empty_bins
       particle_ids = findall(isequal(p), E.bin);
-      Ñ[p] = sqrt(B.ν[p] * sum(E.ω[particle_ids] .* 𝒱.(E.ξ[particle_ids],t)));
+      Ñ[p] = sqrt(B.ν[p] * sum(E.ω[particle_ids] .* h.(E.ξ[particle_ids],t)));
    end
 
    if(sum(Ñ)>0)
