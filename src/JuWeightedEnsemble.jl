@@ -147,10 +147,6 @@ function run_we!(E, B, mutation, selection!, rebin!, n_we_steps)
       @. E.ω = E.ω̂;
       E.ξ .= map(mutation, E.ξ̂);
       rebin!(E, B, t);
-      # @. E.bin = bin_id(E.ξ);
-      # if (update_ν)
-      #    update_bin_weights!(B, E);
-      # end
    end
    E, B
 
@@ -176,11 +172,6 @@ function prun_we!(E, B, mutation, selection!, rebin!, n_we_steps)
       @. E.ω = E.ω̂
       E.ξ .= pmap(mutation, E.ξ̂);
       rebin!(E, B, t);
-      # #E.bin .= pmap(bin_id, E.ξ);
-      # @. E.bin = bin_id(E.ξ);
-      # if (update_ν)
-      #    update_bin_weights!(B, E);
-      # end
    end
    E, B
 
