@@ -11,16 +11,17 @@ using JuBasicMD: MALA, MALA!
 using JuBasicMD: EM, EM!
 using ForwardDiff
 using Optim
+using StaticArrays
 
 #  set up potentail
 function V(x)
 
-    aa = Float64[-1, -1, -6.5, 0.7];
-    bb = Float64[0., 0., 11., 0.6];
-    cc = Float64[-10., -10., -6.5, 0.7];
-    AA = Float64[-200., -100., -170., 15.];
-    XX = Float64[1., 0., -0.5, -1.];
-    YY = Float64[0., 0.5, 1.5, 1.];
+    aa = @SVector [-1, -1, -6.5, 0.7];
+    bb = @SVector [0., 0., 11., 0.6];
+    cc = @SVector [-10., -10., -6.5, 0.7];
+    AA = @SVector [-200., -100., -170., 15.];
+    XX = @SVector [1., 0., -0.5, -1.];
+    YY = @SVector [0., 0.5, 1.5, 1.];
 
     return ( AA[1]*exp(aa[1]*(x[1]-XX[1])^2+bb[1]*(x[1]-XX[1])*(x[2]-YY[1])+cc[1]*(x[2]-YY[1])^2)
                  +AA[2]*exp(aa[2]*(x[1]-XX[2])^2+bb[2]*(x[1]-XX[2])*(x[2]-YY[2])+cc[2]*(x[2]-YY[2])^2)
