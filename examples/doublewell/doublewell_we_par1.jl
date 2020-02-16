@@ -32,11 +32,19 @@ n_particles = 10^2;
 B₀ = JuWeightedEnsemble.Voronoi_to_Bins(voronoi_pts);
 @everywhere tree = KDTree(hcat(voronoi_pts...));
 
+# define bin id mapping
+@everywhere bin_id = x-> JuWeightedEnsemble.Voronoi_bin_id(x,tree);
+# define the rebinning function
+function rebin!(E, B, t)
+    @. E.bin = bin_id(E.ξ);
+    JuWeightedEnsemble.update_bin_weights!(B, E);
+    E, B
+end
+
 # define the mutation mapping
 @everywhere mutation = x-> MALA(x, V, gradV!, β, Δt, nΔt_coarse, return_trajectory=false)[1];
 @everywhere mutation! = x-> MALA!(x, V, gradV!, β, Δt, nΔt_coarse);
-# define bin id mapping
-@everywhere bin_id = x-> JuWeightedEnsemble.Voronoi_bin_id(x,tree);
+
 Random.seed!(100);
 x0_vals = copy(voronoi_pts);
 bin0_vals = bin_id.(voronoi_pts);
@@ -46,7 +54,8 @@ T = JuWeightedEnsemble.pbuild_coarse_transition_matrix(mutation!, bin_id, x0_val
 # define coarse observable as a bin function
 F = f.(voronoi_pts);
 value_vectors = JuWeightedEnsemble.build_value_vectors(n_we_steps,T,float.(F));
-selection! = (E, B, j)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,value_vectors,j)
+h = (x,t)-> value_vectors[t][bin_id(x)]
+selection! = (E, B, t)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,h,t)
 
 # set up ensemble
 ξ₀ = [copy(x₀) for i = 1:n_particles];
@@ -54,13 +63,12 @@ selection! = (E, B, j)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,va
 
 E₀ = Ensemble{Array{Float64,1}, Float64, Int}(copy(ξ₀),copy(ξ₀),copy(ω₀), copy(ω₀),
                             zeros(Int, n_particles),zeros(Int, n_particles));
-@. E₀.bin =bin_id(E₀.ξ);
-JuWeightedEnsemble.update_bin_weights!(B₀, E₀);
+rebin!(E₀, B₀, 0);
 
 # run
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-JuWeightedEnsemble.prun_we!(E, B, mutation,selection!, bin_id, n_we_steps);
+JuWeightedEnsemble.prun_we!(E, B, mutation,selection!, rebin!, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)

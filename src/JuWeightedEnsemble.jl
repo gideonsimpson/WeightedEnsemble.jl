@@ -137,20 +137,16 @@ end
 * `B` - bin data structure
 * `mutation` - mutation function
 * `selection!` - selection scheme
-* `bin_id` - bin identification function
+* `rebin!` - rebin and update particles and bins
 * `n_we_steps` - number of steps in the WE run
-* `update_ν=true` - update the bin weights, if needed
 """
-function run_we!(E, B, mutation, selection!, bin_id, n_we_steps; update_ν=true)
+function run_we!(E, B, mutation, selection!, rebin!, n_we_steps)
 
-   for j in 1:n_we_steps
-      selection!(E, B, j);
+   for t in 1:n_we_steps
+      selection!(E, B, t);
       @. E.ω = E.ω̂;
       E.ξ .= map(mutation, E.ξ̂);
-      @. E.bin = bin_id(E.ξ);
-      if (update_ν)
-         update_bin_weights!(B, E);
-      end
+      rebin!(E, B, t);
    end
    E, B
 
@@ -166,21 +162,16 @@ pool has already been created.
 * `B` - bin data structure
 * `mutation` - mutation function
 * `selection!` - selection scheme
-* `bin_id` - bin identification function
+* `rebin!` - rebin and update particles and bins
 * `n_we_steps` - number of steps in the WE run
-* `update_ν=true` - update the bin weights, if needed
 """
-function prun_we!(E, B, mutation, selection!, bin_id, n_we_steps; update_ν=true)
+function prun_we!(E, B, mutation, selection!, rebin!, n_we_steps)
 
-   for j in 1:n_we_steps
-      selection!(E, B, j);
+   for t in 1:n_we_steps
+      selection!(E, B, t);
       @. E.ω = E.ω̂
       E.ξ .= pmap(mutation, E.ξ̂);
-      #E.bin .= pmap(bin_id, E.ξ);
-      @. E.bin = bin_id(E.ξ);
-      if (update_ν)
-         update_bin_weights!(B, E);
-      end
+      rebin!(E, B, t);
    end
    E, B
 

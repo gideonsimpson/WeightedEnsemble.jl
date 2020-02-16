@@ -38,17 +38,17 @@ end
 
 
 """
-`optimal_allocation_selection!`: Select particles according to the bins, using
-the value vectors for optimal allocation.
+`optimal_allocation_selection!`: Optimally particles according to the bins,
+using a value function to approximate mutation variance.
 
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
-* `value_vectors` - value vectors for resampling
-* `j` - j-th seletion step
+* `h` - value function estimator
+* `t` - t-th seletion step
 * `resample` - resampling scheme
 """
-function optimal_allocation_selection!(E::Ensemble, B::Bins, value_vectors,j; resample=Systematic)
+function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Systematic)
 
    n_particles = length(E);
    n_bins = length(B);
@@ -56,23 +56,38 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, value_vectors,j; re
    @. E.offspring = 0;
    @. B.target = 0;
 
-   if(B.ν ⋅ value_vectors[j] <= 0)
-      throw(DomainError(j,"Bin Weights ⟂ Value Vector"));
+   # zero out offspring counts
+   @. E.offspring = 0;
+   @. B.target = 0;
+
+   # identify nonempty bins
+   non_empty_bins = findall(n->n>0, B.n);
+   R = length(non_empty_bins);
+   Ñ = zeros(n_bins);
+
+   for p in non_empty_bins
+      particle_ids = findall(isequal(p), E.bin);
+      Ñ[p] = sqrt(B.ν[p] * sum(E.ω[particle_ids] .* h.(E.ξ[particle_ids],t)));
    end
 
-   # find target number of offspring for the bins based on
-   # bin weights
-   non_empty_bins = findall(n->n>0, B.n);
-   R = length(non_empty_bins); # count number of bins which must have offspring
-   B.target .= (B.n .>0) .+ resample(n_particles-R, (B.ν .* value_vectors[j])/(B.ν ⋅ value_vectors[j]));
+   if(sum(Ñ)>0)
+      # normalize
+      Ñ .= n_particles * Ñ/sum(Ñ);
+      B.target .= (B.n .>0) .+ resample(n_particles-R, Ñ./n_particles);
 
-   # compute number of offspring of each particle bin by bin
-   for p in non_empty_bins
-      # get particle indices for bin i
-      particle_ids = findall(isequal(p), E.bin);
-      if !isempty(particle_ids)
-         E.offspring[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
+      # compute number of offspring of each particle bin by bin
+      for i in 1:n_bins
+         # get particle indices for bin i
+         particle_ids = findall(isequal(i), E.bin);
+         if !isempty(particle_ids)
+            E.offspring[particle_ids] = resample(B.target[i], E.ω[particle_ids]/B.ν[i]);
+         end
       end
+
+   else
+      # every particle copies itself
+      B.target .= B.n;
+      @. E.offspring = 1;
    end
 
    # resample the particles

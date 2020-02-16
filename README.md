@@ -10,11 +10,12 @@ To guide the selection process, the state space is partitioned up into a collect
 The key functions and data structures that must be provided by the user are:
 
 * An initial ensemble, stored in the `Ensemble` data structure, with initial particle positions and weights.
-* A list of of bins, stored in the `Bins` data structure, together with a `bin_id` function that uniquely maps positions in state to one of the bins.  
+* A list of of bins, stored in the `Bins` data structure, together with a `rebin!` function that associates particle positions with bins.
 * A `mutation` function which evolves particles under the underlying, unbiased, dynamic
-* A `selection!` function, which selects which particles to produce offspring before performuing the `mutation`.  Two selection schemes are currently included:
+* A `selection!` function, which selects which particles to produce offspring before performing the `mutation`.  Two selection schemes are currently included:
     * `uniform_selection` - This uniformly samples from the particles, ensuring that there is at least one particle spawned from a bin which is non-empty.
-    * `optimal_allocation_selection!` - This uses a coarse scale model and a quantity of interest to allocate particles in a way that minimizes mutation variance.  To use it, it is necessary to construct "value vectors". These value vectors can be constructed by building up a bin to bin coarse Markov model, estimating the QoI when restricted to the bins, and then using the included `build_value_vectors`.  A coarse Markov model can be constructed with the included `build_coarse_transition_matrix`.
+    * `optimal_allocation_selection!` - This uses a coarse scale model and a quantity of interest to allocate particles in a way that minimizes mutation variance.  To use it, it is necessary to construct a "value function" which approximates the mutation variance of the problem.  The value function can be constructed by first building a coarse grained transition matrix for the model, form which "value_vectors", based on the QoI, can be constructed.  Tools for building up the value vectors and the coarse model are included with  `build_value_vectors` and `build_coarse_transition_matrix`.
+
 
 Parallel versions of the construction of the coarse transition matrix and the actual WE are also included.  These distribute the work of the mutation step, usually the most costly, and an inherently independent computation, across workers.  
 
@@ -30,6 +31,10 @@ overdamped Langevin equation.
 * The Muller potential, where we estimate the probability of moving from one
 minimum to another in a specified time.  This version uses the overdamped
 Langevin equation.
+
+# Notes
+
+* The code is currently implemented for problems where the underlying problem is time homogeneous.  Thus, the `mutation` function should only take the current state as its argument.  However, both the `selection!` and `rebin!` functions will take the algorithmic time as an argument.  This is relevant for computing certain QoI and for adaptive binning strategies.
 
 # Caveats
 
