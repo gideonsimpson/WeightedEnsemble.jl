@@ -19,7 +19,7 @@ The key functions and data structures that must be provided by the user are:
 
 Parallel versions of the construction of the coarse transition matrix and the actual WE are also included.  These distribute the work of the mutation step, usually the most costly, and an inherently independent computation, across workers.  
 
-More details on the algorithm are described in the references below.    In particular, this code uses optimal allocation of the particles to minimize selection variance.
+More details on the algorithm are described in ``WE_description.pdf``, which may be found in the `doc` folder.
 
 # Examples
 

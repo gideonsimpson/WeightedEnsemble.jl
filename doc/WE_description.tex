@@ -1,0 +1,501 @@
+\documentclass[11pt,letterpaper]{amsart}
+\setlength{\oddsidemargin}{.0in}
+\setlength{\evensidemargin}{.0in}
+\setlength{\textwidth}{6.5in}
+\setlength{\topmargin}{-.3in}
+\setlength{\headsep}{.20in}
+\setlength{\textheight}{9.in}
+\usepackage[leqno]{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bbm}
+\usepackage{amssymb}
+\usepackage[all]{xy}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[foot]{amsaddr}
+%Here are some user-defined notations
+\newcommand{\RR}{\mathbf R}
+\newcommand{\CC}{\mathbf C}
+\newcommand{\ZZ}{\mathbf Z}
+\newcommand{\ZZn}[1]{\ZZ/{#1}\ZZ}
+\newcommand{\QQ}{\mathbf Q}
+\newcommand{\rr}{\mathbb R}
+\newcommand{\cc}{\mathbb C}
+\newcommand{\zz}{\mathbb Z}
+\newcommand{\zzn}[1]{\zz/{#1}\zz}
+\newcommand{\qq}{\mathbb Q}
+\newcommand{\calM}{\mathcal M}
+\newcommand{\latex}{\LaTeX}
+\newcommand{\tex}{\TeX}
+\newcommand{\dd}{{\rm d}}
+\newcommand{\sm}{\setminus} 
+
+
+%Here are commands with variable inputs 
+\newcommand{\intf}[1]{\int_a^b{#1}\,\dd{x}}
+\newcommand{\intfb}[3]{\int_{#1}^{#2}{#3}\,\dd{x}}
+\newcommand{\pln}[1]{$\sm${\tt #1}}
+\newcommand{\bgn}[1]{$\tt {\sm}begin\{#1\}$}
+\newcommand{\nd}[1]{$\tt {\sm}end\{#1\}$}
+\newcommand{\marginalfootnote}[1]{%
+        \footnote{#1}
+        \marginpar[\hfill{\sf\thefootnote}]{{\sf\thefootnote}}}
+\newcommand{\edit}[1]{\marginalfootnote{#1}}
+
+
+%Here are some user-defined operators
+\newcommand{\Tr}{\operatorname {Tr}}
+\newcommand{\GL}{\operatorname {GL}}
+\newcommand{\SL}{\operatorname {SL}}
+\newcommand{\Prob}{\operatorname {Prob}}
+\newcommand{\re}{\operatorname {Re}}
+\newcommand{\im}{\operatorname {Im}}
+
+
+%These commands deal with theorem-like environments (i.e., italic)
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%These deal with definition-like environments (i.e., non-italic)
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+%This numbers equations by section
+\numberwithin{equation}{section}
+
+
+
+
+
+
+\title{An implementation of optimized weighted ensemble}
+\author{Felix Jones$^1$}
+\address{$^1$Department of Mathematics, Drexel University}
+\email{fgj23@drexel.edu}
+\author{Gideon Simpson$^1$}
+\email{grs53@drexel.edu}
+\author{David Aristoff$^2$}
+\address{$^2$Department of Mathematics, Colorado State University}
+\email{aristoff@rams.colostate.edu}
+\author{Jeremy Copperman$^3$}
+\address{$^3$Department of Biomedical Engineering, Oregon 
+Health \& Science University}
+\email{copperma@ohsu.edu}
+\author{Robert J. Webber$^4$}
+\address{$^4$Courant Institute, New York University}
+\email{rw2515@nyu.edu}
+\author{Daniel M. Zuckerman$^3$}
+\email{zuckermd@ohsu.edu}
+
+
+\begin{document}
+\maketitle
+
+\section{Desciption of the method}
+
+\subsection{Introduction} Weighted ensemble is an 
+importance sampling interacting 
+particle method that simulates 
+the evolution of a generic 
+Markov chain. 
+The method consists of a fixed number of 
+weighted particles, 
+evolving via repeated 
+{\em selection} and {\em mutation} steps. 
+
+The mutation step 
+is simply evolution by the underlying 
+Markov chain kernel.
+The selection step corresponds to 
+resampling from the weighted particles. 
+The resampling is based on {\em binning} 
+the particles, 
+and it may be designed 
+to keep more particles in important 
+regions of space to reduce the 
+variance of computations of the 
+quantity of interest (QOI). 
+Using a genealogical 
+analogy, we refer to particles 
+before selection as {\em parents}, 
+and just after selection as {\em children}.
+
+This implementation of weighted ensemble 
+focuses on optimizing the parameter 
+choices, namely the bins and the 
+number of children to put in each bin.
+
+\subsection{Outline of the algorithm}
+
+In the selection step, each 
+parent is either killed, or copied 
+to produce one or more children. The 
+children are initially identical to 
+their parents, but they evolve forward 
+in time independently. The
+childrens' weights are 
+adjusted so that 
+the weighted ensemble is not 
+biased. This is implemented as follows.
+\begin{itemize}
+\item The parents are grouped
+into {\em bins}, 
+and a target number of 
+children is defined for each bin. We refer 
+to these targets as the {\em particle allocation}. 
+Both the bins and the particle allocation 
+are user-chosen parameters. 
+\item In each bin, the  
+children are resampled
+from parents according to their weights. 
+For instance, the 
+children could be obtained by
+sampling, with replacement, 
+the target number of parents, 
+according to the weight distribution 
+of the parents in the bin. 
+\item
+In each bin, the children 
+are all given the same weight, which is 
+chosen so that the total weight 
+in the bin remains the same before 
+and after the selection step.
+\end{itemize}
+
+
+In the mutation step, the 
+children evolve independently 
+according to the law of the 
+underlying Markov chain, becoming 
+the next parents.
+Their weights remain 
+the same during this step.
+
+\subsection{Algorithm details}
+
+Let $K$ be the underlying Markov kernel, 
+$N$ the total number of particles, 
+and $t \ge 0$ the time, 
+which counts the number of combined selection 
+and mutation steps. Before selection, the particles 
+and their weights are written, respectively,
+$$\xi_t^1,\ldots,\xi_t^N \text{ and } 
+\omega_t^1,\ldots,\omega_t^N,$$
+After resampling, the particles 
+and weights are denoted
+$$\hat\xi_t^1,\ldots,\hat\xi_t^N\text{ and } 
+\hat\omega_t^1,\ldots,\hat\omega_t^N.$$
+Weighted ensemble evolves from 
+time $t$ to $t+1$ as follows:
+\begin{align*}
+&\{\xi_t^i\}^{i=1,\ldots,N}
+\xrightarrow{\textup{selection}} 
+\{{\hat \xi}_t^i\}^{i=1,\ldots,N}
+\xrightarrow{\textup{mutation}} 
+\{{\xi}_{t+1}^i\}^{i=1,\ldots,N},\\
+&\{\omega_t^i\}^{i=1,\ldots,N}
+\xrightarrow{\textup{selection}} 
+\{{\hat \omega}_t^i\}^{i=1,\ldots,{N}}
+\xrightarrow{\textup{mutation}} 
+\{{\omega}_{t+1}^i\}^{i=1,\ldots,N}.
+\end{align*}
+The initial weights must be strictly positive and sum to one, 
+$\omega_0^1+\ldots+\omega_0^N = 1$.
+
+The mutation step consists 
+of the particles evolving independently
+according to  
+$K$.
+This means that $\xi_{t+1}^j$ is 
+distributed as $K({\hat \xi}_t^j,\cdot)$, 
+and the $\xi_{t+1}^j$ are independent over 
+$j$, conditional on $\hat{\xi}_t^1,\ldots,\hat{\xi}_t^N$.
+The 
+weights do not change during the 
+mutation step, 
+$${\omega}_{t+1}^{j} = \hat{\omega}_{t}^j.$$
+
+The selection step requires user-chosen 
+{\em bins} and {\em particle 
+allocation}. 
+The bins are labeled by ${\mathcal B}$, 
+and the particle allocation is defined 
+by $N_t(u)$, the number of children in each bin $u \in {\mathcal B}$ at time $t$. 
+The children in bin $u \in {\mathcal B}$ 
+are obtained by sampling $N_t(u)$ 
+times, with replacement, from the 
+weight distribution of the parents in bin $u$:
+$$Pr(\textup{sample }\xi_t^j\text{ in bin }u) = \frac{\omega_t^j}{\omega_t(u)}, \qquad \omega_t(u) := \sum_{i:\textup{bin}(\xi_t^i) = u}\omega_t^i.$$
+Here $\textup{bin}(\xi_t^i) = u$ means $\xi_t^i$ is assigned to bin $u$.
+All of the children in any bin have the same weight, 
+$$\hat{\omega}_t^j = \frac{\omega_t(u)}{N_t(u)},\qquad \text{if bin}(\hat{\xi}_t^j) =u.$$
+
+Each bin with a parent 
+must have at least 
+one child after selection, and if a bin 
+contains no parents, 
+it can have no children. Thus, $N_t(u) \ge 1$
+if and only if $\omega_t(u)>0$. The total number of particles is always $N$, 
+so $\sum_{u \in {\mathcal B}}N_t(u) = N$. 
+Total particle weight is also preserved in time.
+
+
+
+\section{Optimizing the parameters}
+
+
+\subsection{Quantities of interest}
+
+Let
+$(\xi_t)$ be a Markov chain with kernel $K$, and let
+$f$ be a function on its state space. The bin optimization and optimal particle allocation 
+are targeted for the computation of a particular 
+QOI. We 
+consider two types:
+\begin{itemize}
+\item[] {\em Finite time}: The QOI is ${\mathbb E}[f(\xi_T)]$, where $T$ is a deterministic time, which is estimated by
+$${\mathbb E}[f(\xi_T)] \approx \sum_{i=1}^N \omega_T^i f(\xi_T^i).$$
+\item[]{\em Steady state}: The QOI is $\int f\,d\mu$, where 
+$\mu$ is the stationary distribution of $(\xi_t)$, which we assume is ergodic. Given a user-chosen final time $T$, weighted ensemble estimates this by
+$$\int f \,d\mu \approx \frac{1}{T}\sum_{t=0}^{T-1}\sum_{i=1}^N \omega_t^i f(\xi_t^i).$$
+\end{itemize}
+
+\subsection{Bin optimization}
+
+The bins can be optimized by using a  
+{\em selection 
+discrepancy function} $H_t = H_t(\xi)$ defined on 
+the particles $\xi$. 
+The bins are defined so that the values 
+of $H_t$ on the particles in each 
+bin does not vary too much. More precisely: 
+\begin{itemize}
+\item The bins are chosen to minimize, over choices of bins, the cost function
+$$\sum_{u \in {\mathcal B}} \textup{Var}(H_t(\xi_t^i)^{i:\textup{bin}(\xi_t^i) = u}),$$
+where $H_t(\xi_t^i)^{i:\textup{bin}(\xi_t^i) = u}$ is the vector of values of $H_t$ on the particles in bin $u$.
+\end{itemize}
+
+We implement this by applying $k$-means to the vector 
+$H_t(\xi_t^i)^{i=1,\ldots,N}$ of the values of $H_t$ 
+on all the particles. The $k$-means clusters are the bins, 
+and $k$ is the user-chosen number of bins.
+
+\subsection{Optimal allocation}
+
+The particle allocation can be optimized 
+via a {\em 
+selection value function} $V_t = V_t(u)$ defined 
+on the bins $u$. The particle 
+allocation is defined so that 
+\begin{itemize}
+\item The number of children in bin $u$ satisfies
+\begin{equation*}
+N_t(u) \approx \frac{N\omega_t(u)V_t(u)}{\sum_{u \in {\mathcal B}}\omega_t(u)V_t(u)} \qquad \text{and}\qquad N_t(u) \ge 1\text{ whenever } \omega_t(u)>0.
+\end{equation*}
+\end{itemize}
+
+We achieve this by assigning one child to 
+each bin with a parent, and then allocating
+the remainder of the children according to the 
+distribution $\omega_t(u)V_t(u)/\sum_{u \in {\mathcal B}}\omega_t(u)V_t(u)$. If the denominator here is zero, we skip the selection step and proceed directly to mutation.
+
+
+
+\section{Formulas for optimization}
+
+\subsection{Feedback formulas}
+
+The selection discrepancy and selection value 
+functions that minimize the variance can 
+be written in terms of the QOI in a   
+feedback form. The feedback expressions we need are as follows.
+\begin{align*}
+&\textup{\em Finite time}: h_t(\xi) = {\mathbb E}[f(\xi_T)|\xi_t = \xi] \equiv K^{T-t}f(\xi),\\
+&\textup{\em Steady state}: h(\xi) = \sum_{s=0}^\infty {\mathbb E}\left.\left[f(\xi_s)-\int f\,d\mu\right|\xi_0 = \xi\right] \equiv \sum_{s=0}^\infty \left(K^sf(\xi) - \int f\,d\mu\right).
+\end{align*}
+
+Note 
+that $h$ is the solution to the Poisson equation $(\textup{Id} -K)h = f - \int f\,d\mu$. Since we 
+will also require variances of the quantities above, we 
+introduce the notation
+$$\textup{Var}_{K(\xi,\cdot)}g = \textup{Var}[g(\xi_{t+1})|\xi_t = \xi] \equiv Kg^2(\xi) - (Kg(\xi))^2,$$
+where we will have either $g = h_{t+1}$ or $g = h$.
+
+Because of their feedback form, these functions 
+are not exactly computable in practice. 
+In the code, the expressions above are estimated 
+by using a {\em coarse model} for $K$ and $f$. 
+
+\subsection{The selection discrepancy and selection value functions}
+
+Exact formulas for the selection
+discrepancy function $H_t = H_t(\xi)$ that minimizes variance are:
+\begin{align*}
+&\textup{\em Finite time}: H_t(\xi) = Kh_{t+1}(\xi) = h_t(\xi),\\
+&\textup{\em Steady state}: H_t(\xi) = Kh(\xi).
+\end{align*}
+
+Exact formulas for the selection
+value function $V_t = V_t(u)>0$ that minimizes variance are:
+\begin{align*}
+&\textup{\em Finite time}: V_t(u)^2 = \sum_{i:\textup{bin}(\xi_t^i) = u} \frac{\omega_t^i}{\omega_t(u)} \textup{Var}_{K(\xi_t^i,\cdot)}h_{t+1},\\
+&\textup{\em Steady state}: V_t(u)^2 = \sum_{i:\textup{bin}(\xi_t^i) = u} \frac{\omega_t^i}{\omega_t(u)} \textup{Var}_{K(\xi_t^i,\cdot)}h.
+\end{align*}
+
+\section{Traditional implementation}
+
+This code also includes the traditional 
+weighted ensemble implementation, in 
+which bins 
+are usually defined as Voronoi regions, 
+and the allocation is {\em uniform}, 
+meaning roughly the same number of children 
+are in each bin, that is, $N_t(u)$ is nearly 
+constant in $u \in {\mathcal B}$.
+
+
+\section{Reference guide}
+
+See~\cite{aristoff2016analysis,aristoff2018steady} for details on some of the 
+optimizations described above. See~\cite{huber1996weighted} for the original 
+weighted ensemble paper, and~\cite{aristoff2016analysis,aristoff2019ergodic,aristoff2018steady,
+bhatt2010steady,costaouec2013analysis,darve2013computing,
+zhang2010weighted,zuckerman} 
+for analyses of weighted ensemble. See~\url{https://westpa.github.io/westpa/}
+for a complete list of weighted ensemble papers. See~\cite{westpa,zwier2015westpa} for the main weighted ensemble 
+code and Github page.
+See~\cite{del2004feynman,del2005genealogical,webber1} 
+and references therein for a 
+related sequential Monte Carlo method and~\cite{chraibi2018optimal,webber1} for 
+optimization in that context. See~\cite{jeremy} 
+for details more details on 
+combining weighted ensemble with a coarse 
+model to improve efficiency and accuracy. For 
+a comparison of different resampling techniques, 
+see~\cite{douc2005comparison,webber2}.
+
+
+\begin{thebibliography}{}
+
+\bibitem{aristoff2016analysis}
+D.~Aristoff.
+\newblock Analysis and optimization of weighted ensemble sampling.
+\newblock {\em ESAIM: Mathematical Modelling and Numerical Analysis}, 52(2018), 1219--1238, 
+2018.
+
+\bibitem{aristoff2019ergodic}
+D.~Aristoff.
+\newblock An ergodic theorem for weighted ensemble.
+\newblock {\em arXiv preprint arXiv:1906.00856v4}.
+ 
+ \bibitem{aristoff2018steady} D. Aristoff and D.M. Zuckerman, Optimizing weighted ensemble sampling of steady states, 
+       {\em arXiv preprint arXiv:1806.00860v4}, 2019.
+       
+\bibitem{bhatt2010steady}
+D.~Bhatt, B.~W. Zhang, and D.~M. Zuckerman.
+\newblock Steady-state simulations using weighted ensemble path sampling.
+\newblock {\em The Journal of chemical physics}, 133(1):014110, 2010.
+       
+       
+       
+\bibitem{jeremy}
+J. Copperman and D.M. Zuckerman.
+\newblock Accelerated estimation of long-timescale kinetics by
+combining weighted ensemble simulation with
+Markov model “microstates” using non-Markovian
+theory.
+\newblock {\em arXiv preprint arXiv:1903.04673}.
+
+\bibitem{chraibi2018optimal}
+H.~Chraibi, A.~Dutfoy, T.~Galtier, and J.~Garnier.
+\newblock Optimal input potential functions in the interacting particle system
+  method.
+\newblock {\em arXiv preprint arXiv:1811.10450}, 2018.
+
+
+       
+\bibitem{costaouec2013analysis}
+R.~Costaouec, H.~Feng, J.~Izaguirre, and E.~Darve.
+\newblock Analysis of the accelerated weighted ensemble methodology.
+\newblock {\em Discrete and Continuous Dynamical Systems}, pages 171--181,
+  2013.
+
+\bibitem{darve2013computing}
+E.~Darve and E.~Ryu.
+\newblock Computing reaction rates in bio-molecular systems using discrete
+  macro-states.
+\newblock {\em arXiv preprint arXiv:1307.0763}, 2013.
+       
+       
+ \bibitem{douc2005comparison}
+R.~Douc and O.~Capp{\'e}.
+\newblock Comparison of resampling schemes for particle filtering.
+\newblock In {\em Image and Signal Processing and Analysis, 2005. ISPA 2005.
+  Proceedings of the 4th International Symposium on}, pages 64--69. IEEE, 2005.
+       
+\bibitem{huber1996weighted}
+G.~A. Huber and S.~Kim.
+\newblock Weighted-ensemble brownian dynamics simulations for protein
+  association reactions.
+\newblock {\em Biophysical journal}, 70(1):97--110, 1996.       
+
+\bibitem{del2004feynman}
+P.~Del~Moral.
+\newblock Feynman-kac formulae: genealogical and interacting particle
+  approximations.
+\newblock {\em Probability and Its Applications, Springer}, 2004.
+       
+       
+\bibitem{del2005genealogical}
+P.~Del~Moral, J.~Garnier, et~al.
+\newblock Genealogical particle analysis of rare events.
+\newblock {\em The Annals of Applied Probability}, 15(4):2496--2534, 2005.
+
+
+\bibitem{webber2}
+R.J. Webber.
+\newblock  Unifying Sequential Monte Carlo with Resampling Matrices.
+\newblock {\em arXiv preprint arXiv:1903.12583}, 2019.
+
+\bibitem{webber1}
+R.J. Webber, D.A. Plotkin, M.E. O'Neill, D.S. Abbot, and J. Weare.  
+\newblock Practical rare event sampling for extreme mesoscale weather.
+\newblock {\em arXiv preprint arXiv:1904.03464}, 2019.
+
+\bibitem{zhang2010weighted}
+B.~W. Zhang, D.~Jasnow, and D.~M. Zuckerman.
+\newblock The “weighted ensemble” path sampling method is statistically
+  exact for a broad class of stochastic processes and binning procedures.
+\newblock {\em The Journal of chemical physics}, 132(5):054107, 2010.
+
+\bibitem{zuckerman}
+D.M. Zuckerman and L.T. Chong. 
+\newblock
+Weighted Ensemble Simulation: Review of Methodology, Applications, and Software. 
+\newblock {Annu. Rev. Biophys.} 46: 43--57, 2017.
+
+\bibitem{westpa}
+M.C. Zwier, J.~L. Adelman, J.~W. Kaus, A.~J. Pratt, K.~F. Wong, N.~S. Rego,
+  E.~Su{\'a}rez, S.~Lettieri, D.~W. Wang, M.~Grabe, D.~M. Zuckerman, and L.~T.
+  Chong.
+\newblock Westpa github pack.
+\newblock {\em https://westpa.github.io/westpa/}, 2015--.
+
+\bibitem{zwier2015westpa}
+M.~C. Zwier, J.~L. Adelman, J.~W. Kaus, A.~J. Pratt, K.~F. Wong, N.~B. Rego,
+  E.~Su{\'a}rez, S.~Lettieri, D.~W. Wang, M.~Grabe, D.M. Zuckerman, andL.T. Chong.
+\newblock Westpa: An interoperable, highly scalable software package for
+  weighted ensemble simulation and analysis.
+\newblock {\em Journal of chemical theory and computation}, 11(2):800--809,
+  2015.
+       
+       \end{thebibliography}
+       
+\end{document}
