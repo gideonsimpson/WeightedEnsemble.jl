@@ -3,35 +3,29 @@
 steps with bin transition matrix `T`.  Used for optimal allocation.
 
 ### Arguments
-* `n` - number of steps
+* `n_we_steps` - number of WE steps
 * `T` - bin transition matrix
 * `u` - quantity of interest vector on the bin space
-* `tol` - tolerance for negative values which may appear due to roundoff
 """
-function build_value_vectors(n, T, u; tol=1e-15)
+function build_value_vectors(n_we_steps, T, u)
    n_bins = length(u);
-   vvals = [zeros(n_bins) for j in 1:n];
+   vvals = [zeros(n_bins) for j in 1:n_we_steps];
+   Tv =similar(u);
+   v = deepcopy(u);
+   # vector of 1's
+   e = ones(n_bins);
 
-   Tu = copy(u);
-   v1 = similar(u);
-   v2 = similar(u);
-
-   # l = n - p - 1, p = 0,...,n-1, l = n-1,...,0
-   for l in n-1:-1:0
-      # at the begining of the loop Tu = T^(n-p-1) u = T^l u
-      v1 = copy(Tu);
-      # Tu = T^(n-p) u = T^(l+1) u
-      Tu .= T * Tu;
-      v2 = copy(Tu);
-      @. v1 = v1^2;
-      v1 .= T * v1;
-      @. v2 = v2^2;
-      if(minimum(v1-v2)> -tol)
-         @. vvals[l+1] .= sqrt(max(v1 - v2, 0));
-      else
-         throw(DomainError(l,"Nontrivial negative entry in value vector"));
+   # l = n_we_steps - t - 1,
+   # t = 0,...,n_we_steps-1, l = n_we_steps-1,...,0
+   for l in n_we_steps-1:-1:0
+      # T applied to u n_we_steps - l times
+      Tv .= T*v;
+      # compute variance row by row
+      for p in 1:n_bins
+          vvals[l+1][p] = T[p,:]⋅((v .- e * (Tv[p])).^2)
       end
-
+      # update for next iterate
+      v .= Tv;
    end
    return vvals
 end
