@@ -4,8 +4,8 @@ X(T) ∈ B for the Muller potential.
 =#
 
 using Distributed
-nw = 4; # number of workers
-addprocs(nw);
+# nw = 4; # number of workers
+# addprocs(nw);
 
 using StatsBase
 using HypothesisTests
