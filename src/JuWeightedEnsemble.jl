@@ -182,7 +182,7 @@ function run_we!(E, B, mutation, selection!, rebin!, n_we_steps)
    for t in 1:n_we_steps
       selection!(E, B, t);
       @. E.ω = E.ω̂;
-      E.ξ .= map(mutation, E.ξ̂);
+      @. E.ξ = mutation(E.ξ̂);
       rebin!(E, B, t);
    end
    E, B
