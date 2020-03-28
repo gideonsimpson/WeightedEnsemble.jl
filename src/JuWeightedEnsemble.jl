@@ -49,41 +49,9 @@ function build_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n
    return K
 end
 
+
 """
 `pbuild_coarse_transition_matrix`: Contruct a transition matrix amongst the
-bins in parallel.  It assumed that a pool of workers has already been
-contructed.
-
-### Arguments
-* `mutation!` - an in place mutation function
-* `bin_id` - bin identification function
-* `x0_vals` - an array of starting values
-* `bin0_vals` - an array of the bins corresponding to `x0_vals`
-* `n_bins` - total number of bins
-* `n_samples` - number of trials for each sample
-"""
-function pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
-
-   K = SharedArray{Float64}(n_bins,n_bins);
-   X = similar(x0_vals[1]);
-   @. K  = 0.0;
-
-   @sync @distributed for k in 1:n_samples
-      for l in 1:length(x0_vals)
-           X .= deepcopy(x0_vals[l]);
-           i = bin0_vals[l];
-           mutation!(X);
-           j = bin_id(X);
-           K[i,j] +=1.0;
-      end
-  end
-  @. K = K/n_samples;
-  return K
-end
-
-
-"""
-`pbuild_coarse_transition_spmatrix`: Contruct a transition matrix amongst the
 bins in parallel.  It assumed that a pool of workers has already been
 contructed.  Returns a sparse matrix.
 
@@ -96,7 +64,7 @@ contructed.  Returns a sparse matrix.
 * `n_samples` - number of trials for each sample
 """
 
-function pbuild_coarse_transition_spmatrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
+function pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
    n_x0 = length(x0_vals);
    row_vals = SharedArray{Float64}(n_x0*n_samples);
    col_vals = SharedArray{Float64}(n_x0*n_samples);
@@ -186,7 +154,7 @@ function Dirac_to_Ensemble(X::TP, n_particles) where TP
 end
 
 """
-`run_we!`: Run a serial WE simulation with value vectors for optimal allocation.
+`run_we!`: Run a serial WE simulation with
 
 ### Arguments
 * `E` - particle ensemble
@@ -198,20 +166,21 @@ end
 """
 function run_we!(E, B, mutation, selection!, rebin!, n_we_steps)
 
-   for t in 1:n_we_steps
+   for t in 0:n_we_steps-1
+      # first selection is at t = 0
       selection!(E, B, t);
       @. E.ω = E.ω̂;
       @. E.ξ = mutation(E.ξ̂);
-      rebin!(E, B, t);
+      # after mutation, time is t ↦ t+1
+      rebin!(E, B, t+1);
    end
    E, B
 
 end
 
 """
-`prun_we!`: Run a parallel WE simulation with value vectors for optimal
-allocation.  This performs the mutation steps in parallel, and assumes a worker
-pool has already been created.
+`prun_we!`: Run a parallel WE simulation with.  This performs the mutation steps
+in parallel, and assumes a worker pool has already been created.
 
 ### Arguments
 * `E` - particle ensemble
@@ -223,11 +192,13 @@ pool has already been created.
 """
 function prun_we!(E, B, mutation, selection!, rebin!, n_we_steps)
 
-   for t in 1:n_we_steps
+   for t in 0:n_we_steps-1
+      # first selection is at t = 0
       selection!(E, B, t);
       @. E.ω = E.ω̂
       E.ξ .= pmap(mutation, E.ξ̂);
-      rebin!(E, B, t);
+      # after mutation, time is t ↦ t+1
+      rebin!(E, B, t+1);
    end
    E, B
 

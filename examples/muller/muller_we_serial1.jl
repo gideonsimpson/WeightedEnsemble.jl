@@ -53,13 +53,14 @@ Random.seed!(100);
 x0_vals = copy(voronoi_pts);
 bin0_vals = bin_id.(voronoi_pts);
 n_bins = length(B₀);
-T = JuWeightedEnsemble.build_coarse_transition_matrix(mutation!, bin_id, x0_vals,bin0_vals, n_bins, n_samples_per_bin);
+K̃ = JuWeightedEnsemble.build_coarse_transition_matrix(mutation!, bin_id, x0_vals,bin0_vals, n_bins, n_samples_per_bin);
 
 # define coarse observable as a bin function
-F = f.(voronoi_pts);
-value_vectors = JuWeightedEnsemble.build_value_vectors(n_we_steps,T,float.(F));
-h = (x,t)-> value_vectors[t][bin_id(x)];
-selection! = (E, B, t)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,h,t);
+f̃ = f.(voronoi_pts);
+_,v²_vectors = JuWeightedEnsemble.build_coarse_vectors(n_we_steps,K̃,float.(f̃));
+v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
+# define selection function
+selection! = (E, B, t)-> JuWeightedEnsemble.optimal_allocation_selection!(E, B, v², t)
 
 # set up ensemble
 E₀ = JuWeightedEnsemble.Dirac_to_Ensemble(x₀, n_particles);
