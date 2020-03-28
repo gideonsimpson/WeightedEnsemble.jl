@@ -66,12 +66,10 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Syst
       B.target .= (B.n .>0) .+ resample(n_particles-R, Ñ./n_particles);
 
       # compute number of offspring of each particle bin by bin
-      for i in 1:n_bins
-         # get particle indices for bin i
-         particle_ids = findall(isequal(i), E.b);
-         if !isempty(particle_ids)
-            E.o[particle_ids] = resample(B.target[i], E.ω[particle_ids]/B.ν[i]);
-         end
+      for p in non_empty_bins
+         # get particle indices for bin p
+         particle_ids = findall(isequal(p), E.b);
+         E.o[particle_ids] = resample(B.target[i], E.ω[particle_ids]/B.ν[i]);
       end
 
    else
@@ -118,11 +116,9 @@ function uniform_selection!(E::Ensemble, B::Bins; resample=Systematic)
 
    # compute number of offspring of each particle bin by bin
    for p in non_empty_bins
-      # get particle indices for bin i
+      # get particle indices for bin p
       particle_ids = findall(isequal(p), E.b);
-      if !isempty(particle_ids)
-         E.o[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
-      end
+      E.o[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
    end
 
    # resample the particles
