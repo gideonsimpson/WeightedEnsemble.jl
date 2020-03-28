@@ -1,33 +1,37 @@
 """
-`build_value_vectors`: Assemble the value vectors associated with argument `u` for `n`
-steps with bin transition matrix `T`.  Used for optimal allocation.
+`build_coarse_vectors`: Assemble the conditional expectation and 1- step
+variance approximations one a coarser model, given the transition matrix, `K̃`,
+and a coarse scale QoI function, `f̃`.
 
 ### Arguments
 * `n_we_steps` - number of WE steps
-* `T` - bin transition matrix
-* `u` - quantity of interest vector on the bin space
+* `K̃` - coarse scale transition matrix
+* `f̃` - quantity of interest vector on the bin space
 """
-function build_value_vectors(n_we_steps, T, u)
-   n_bins = length(u);
-   vvals = [zeros(n_bins) for j in 1:n_we_steps];
-   Tv =similar(u);
-   v = deepcopy(u);
+function build_coarse_vectors(n_we_steps, K̃, f̃)
+   n_bins = length(f̃);
+   ṽ²_vals = [zeros(n_bins) for j in 1:n_we_steps];
+   h̃_vals = [zeros(n_bins) for j in 1:n_we_steps+1];
+   h̃ = deepcopy(f̃);
+   K̃h̃ =similar(f̃);
    # vector of 1's
    e = ones(n_bins);
+   @. h̃_vals[end] = h̃;
 
-   # l = n_we_steps - t - 1,
-   # t = 0,...,n_we_steps-1, l = n_we_steps-1,...,0
-   for l in n_we_steps-1:-1:0
-      # T applied to u n_we_steps - l times
-      Tv .= T*v;
+   # Use t+1 in indexing since Julia arrays start at 1
+   for t in n_we_steps-1:-1:0
+
+      K̃h̃ .= K̃ * h̃;
       # compute variance row by row
       for p in 1:n_bins
-          vvals[l+1][p] = T[p,:]⋅((v .- e * (Tv[p])).^2)
+           ṽ²_vals[t+1][p] = K̃[p,:]⋅((h̃ .- e * (K̃h̃[p])).^2)
       end
       # update for next iterate
-      v .= Tv;
+      @. h̃ = K̃h̃;
+      @. h̃_vals[t+1] = h̃;
    end
-   return vvals
+
+   return h̃_vals, ṽ²_vals
 end
 
 
@@ -38,11 +42,11 @@ using a value function to approximate mutation variance.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
-* `h` - value function estimator
+* `v²` - v² variance function estimator
 * `t` - t-th seletion step
 * `resample` - resampling scheme
 """
-function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Systematic)
+function optimal_allocation_selection!(E::Ensemble, B::Bins, v², t; resample=Systematic)
 
    n_particles = length(E);
    n_bins = length(B);
@@ -57,7 +61,7 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Syst
 
    for p in non_empty_bins
       particle_ids = findall(isequal(p), E.b);
-      Ñ[p] = sqrt(B.ν[p] * sum(E.ω[particle_ids] .* h.(E.ξ[particle_ids],t)));
+      Ñ[p] = sqrt(B.ν[p] * sum(E.ω[particle_ids] .* v².(E.ξ[particle_ids],t)));
    end
 
    if(sum(Ñ)>0)
@@ -69,7 +73,7 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Syst
       for p in non_empty_bins
          # get particle indices for bin p
          particle_ids = findall(isequal(p), E.b);
-         E.o[particle_ids] = resample(B.target[i], E.ω[particle_ids]/B.ν[i]);
+         E.o[particle_ids] = resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
       end
 
    else
