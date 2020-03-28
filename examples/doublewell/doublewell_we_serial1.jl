@@ -31,7 +31,7 @@ tree = KDTree(hcat(voronoi_pts...));
 bin_id = x-> JuWeightedEnsemble.Voronoi_bin_id(x,tree);
 # define the rebinning function
 function rebin!(E, B, t)
-    @. E.bin = bin_id(E.ξ);
+    @. E.b = bin_id(E.ξ);
     JuWeightedEnsemble.update_bin_weights!(B, E);
     E, B
 end
@@ -60,7 +60,7 @@ selection! = (E, B, t)-> JuWeightedEnsemble.uniform_selection!(E,B);
 ω₀ = 1.0/n_particles * ones(n_particles);
 
 E₀ = Ensemble{Array{Float64,1}, Float64, Int}(copy(ξ₀),copy(ξ₀),copy(ω₀), copy(ω₀),
-                            zeros(Int, n_particles),zeros(Int, n_particles));
+                            zeros(Int, n_particles),zeros(Int, n_particles),zeros(Int, n_particles));
 rebin!(E₀, B₀, 0);
 
 # run

@@ -131,7 +131,7 @@ function update_bin_weights!(B::Bins, E::Ensemble)
 
    # this loops over bins
    for i in 1:n_bins
-      particle_ids = findall(isequal(i), E.bin);
+      particle_ids = findall(isequal(i), E.b);
 
       B.ν[i] = sum(E.ω[particle_ids]);
       B.n[i] = length(particle_ids);

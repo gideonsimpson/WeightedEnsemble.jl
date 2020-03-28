@@ -47,7 +47,7 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Syst
    n_particles = length(E);
    n_bins = length(B);
    # zero out offspring counts
-   @. E.offspring = 0;
+   @. E.o = 0;
    @. B.target = 0;
 
    # identify nonempty bins
@@ -56,7 +56,7 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Syst
    Ñ = zeros(n_bins);
 
    for p in non_empty_bins
-      particle_ids = findall(isequal(p), E.bin);
+      particle_ids = findall(isequal(p), E.b);
       Ñ[p] = sqrt(B.ν[p] * sum(E.ω[particle_ids] .* h.(E.ξ[particle_ids],t)));
    end
 
@@ -68,28 +68,29 @@ function optimal_allocation_selection!(E::Ensemble, B::Bins, h, t; resample=Syst
       # compute number of offspring of each particle bin by bin
       for i in 1:n_bins
          # get particle indices for bin i
-         particle_ids = findall(isequal(i), E.bin);
+         particle_ids = findall(isequal(i), E.b);
          if !isempty(particle_ids)
-            E.offspring[particle_ids] = resample(B.target[i], E.ω[particle_ids]/B.ν[i]);
+            E.o[particle_ids] = resample(B.target[i], E.ω[particle_ids]/B.ν[i]);
          end
       end
 
    else
       # every particle copies itself
       B.target .= B.n;
-      @. E.offspring = 1;
+      @. E.o = 1;
    end
 
    # resample the particles
    n_spawned = 0;
    for i in 1:n_particles
       # identify the bin of the current particle
-      bin = E.bin[i];
-      for k in 1:E.offspring[i]
+      bin = E.b[i];
+      for k in 1:E.o[i]
          E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
+         E.b̂[k+n_spawned] = bin;
       end
-      n_spawned += E.offspring[i];
+      n_spawned += E.o[i];
    end
    E, B
 end
@@ -107,7 +108,7 @@ function uniform_selection!(E::Ensemble, B::Bins; resample=Systematic)
    n_particles = length(E);
    n_bins = length(B);
    # zero out offspring counts
-   @. E.offspring = 0;
+   @. E.o = 0;
    @. B.target = 0;
 
    # ensure each bin with walkers has at least one offspring
@@ -118,9 +119,9 @@ function uniform_selection!(E::Ensemble, B::Bins; resample=Systematic)
    # compute number of offspring of each particle bin by bin
    for p in non_empty_bins
       # get particle indices for bin i
-      particle_ids = findall(isequal(p), E.bin);
+      particle_ids = findall(isequal(p), E.b);
       if !isempty(particle_ids)
-         E.offspring[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
+         E.o[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
       end
    end
 
@@ -128,12 +129,13 @@ function uniform_selection!(E::Ensemble, B::Bins; resample=Systematic)
    n_spawned = 0;
    for i in 1:n_particles
       # identify the bin of the current particle
-      bin = E.bin[i];
-      for k in 1:E.offspring[i]
+      bin = E.b[i];
+      for k in 1:E.o[i]
          E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
+         E.b̂[k+n_spawned] = bin;
       end
-      n_spawned += E.offspring[i];
+      n_spawned += E.o[i];
    end
    E, B
 end
