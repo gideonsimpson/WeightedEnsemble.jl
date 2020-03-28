@@ -131,7 +131,7 @@ function update_bin_weights!(B::Bins, E::Ensemble)
 
    # this loops over bins
    for i in 1:n_bins
-      particle_ids = findall(isequal(i), E.bin);
+      particle_ids = findall(isequal(i), E.b);
 
       B.ν[i] = sum(E.ω[particle_ids]);
       B.n[i] = length(particle_ids);
@@ -164,6 +164,25 @@ end
 """
 function Voronoi_bin_id(X, tree)
    return knn(tree, X, 1)[1][1]
+end
+
+"""
+`Dirac_to_Ensemble`: Convenience function for construction an ensemble from a
+single initial walker.  This hard codes the weights to be Float64 and the bin
+ids and offspring to be of type Int.
+
+### Arguments
+`X` - Starting state of all walkers
+`n_particles` - Number of walkers in the ensemble
+"""
+function Dirac_to_Ensemble(X::TP, n_particles) where TP
+   ω = 1.0/n_particles
+   E = Ensemble{TP, Float64, Int}([deepcopy(X) for i = 1:n_particles],
+                                    [deepcopy(X) for i = 1:n_particles],
+                                    ω * ones(n_particles),ω * ones(n_particles),
+                                    zeros(Int, n_particles),zeros(Int, n_particles),
+                                    zeros(Int, n_particles));
+   return E
 end
 
 """
