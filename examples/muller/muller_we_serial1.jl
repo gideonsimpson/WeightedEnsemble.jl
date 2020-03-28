@@ -62,12 +62,7 @@ h = (x,t)-> value_vectors[t][bin_id(x)];
 selection! = (E, B, t)-> JuWeightedEnsemble.optimal_allocation_selection!(E,B,h,t);
 
 # set up ensemble
-ξ₀ = [copy(x₀) for i = 1:n_particles];
-ω₀ = 1.0/n_particles * ones(n_particles);
-
-E₀ = Ensemble{Array{Float64,1}, Float64, Int}(copy(ξ₀),copy(ξ₀),copy(ω₀), copy(ω₀),
-                            zeros(Int, n_particles),zeros(Int, n_particles),zeros(Int, n_particles));
-
+E₀ = JuWeightedEnsemble.Dirac_to_Ensemble(x₀, n_particles);
 rebin!(E₀, B₀, 0);
 
 # run

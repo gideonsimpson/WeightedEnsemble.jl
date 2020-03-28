@@ -167,6 +167,25 @@ function Voronoi_bin_id(X, tree)
 end
 
 """
+`Dirac_to_Ensemble`: Convenience function for construction an ensemble from a
+single initial walker.  This hard codes the weights to be Float64 and the bin
+ids and offspring to be of type Int.
+
+### Arguments
+`X` - Starting state of all walkers
+`n_particles` - Number of walkers in the ensemble
+"""
+function Dirac_to_Ensemble(X::TP, n_particles) where TP
+   ω = 1.0/n_particles
+   E = Ensemble{TP, Float64, Int}([deepcopy(X) for i = 1:n_particles],
+                                    [deepcopy(X) for i = 1:n_particles],
+                                    ω * ones(n_particles),ω * ones(n_particles),
+                                    zeros(Int, n_particles),zeros(Int, n_particles),
+                                    zeros(Int, n_particles));
+   return E
+end
+
+"""
 `run_we!`: Run a serial WE simulation with value vectors for optimal allocation.
 
 ### Arguments
