@@ -13,7 +13,6 @@ using Distributions
 include("ensemble.jl")
 include("bins.jl")
 
-export AbstractEnsemble, AbstractBins
 export Ensemble, Bins
 
 # Load resampling algorithms
