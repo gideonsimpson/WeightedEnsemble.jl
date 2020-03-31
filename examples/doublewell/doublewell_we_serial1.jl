@@ -16,7 +16,7 @@ using JuWeightedEnsemble
 # number of coarse steps in WE
 n_we_steps = 10;
 # number of time steps during mutation step
-nΔt_coarse = Int(nΔt/n_we_steps);
+nΔt_coarse = ceil(Int,nΔt/n_we_steps);
 # number of samples in coarse matrix
 n_samples_per_bin = 10^2;
 # ensemble size

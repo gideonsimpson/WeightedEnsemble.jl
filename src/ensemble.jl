@@ -1,3 +1,5 @@
+abstract type AbstractEnsemble end
+
 """
 `Ensemble{TP, TW<:AbstractFloat, TB<:Integer}`: A particle ensemble structure designed for WE
 
@@ -11,7 +13,7 @@
 * `b` - particle bin after mutation
 * `o` - number of offspring of the particle
 """
-struct Ensemble{TP, TW<:AbstractFloat, TB<:Integer}
+struct Ensemble{TP, TW<:AbstractFloat, TB<:Integer} <: AbstractEnsemble
    # positions of the walkers after selection, before mutation
    ξ̂::Vector{TP}
    # positions of the walkers after mutation

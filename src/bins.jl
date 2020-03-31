@@ -1,3 +1,5 @@
+abstract type AbstractBins end
+
 """
 `Bins{TS, TW<:AbstractFloat, TB<:Integer, TT<:Real}`: A bin structure designed for WE
 
@@ -8,7 +10,7 @@
 * `target` - target number of particles in each bin
 * `ν` - weight of each bin
 """
-struct Bins{TS, TW<:AbstractFloat, TB<:Integer, TT<:Real}
+struct Bins{TS, TW<:AbstractFloat, TB<:Integer, TT<:Real} <: AbstractBins
    # structure which identifies the bins
    Ω::Vector{TS}
    # number of walkers in each bin
