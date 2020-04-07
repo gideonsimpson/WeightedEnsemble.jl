@@ -21,7 +21,7 @@ using Printf
 # number of coarse steps in WE
 n_we_steps = 10;
 # number of time steps during mutation step
-nΔt_coarse = Int(nΔt/n_we_steps);
+nΔt_coarse = ceil(Int, nΔt/n_we_steps);
 # number of samples in coarse matrix
 n_samples_per_bin = 10^2;
 # ensemble size
@@ -42,8 +42,12 @@ function rebin!(E, B, t)
 end
 
 # define the mutation mapping
-@everywhere mutation = x-> MALA(x, V, gradV!, β, Δt, nΔt_coarse, return_trajectory=false)[1];
-@everywhere mutation! = x-> MALA!(x, V, gradV!, β, Δt, nΔt_coarse);
+opts = Options(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
+@everywhere function mutation(x)
+    Xvals, _ = sample_trajectory(x, sampler, options=opts);
+    return Xvals[end]
+end
+@everywhere mutation! = x-> sample_trajectory!(x, sampler, options=opts);
 
 Random.seed!(100);
 x0_vals = copy(voronoi_pts);

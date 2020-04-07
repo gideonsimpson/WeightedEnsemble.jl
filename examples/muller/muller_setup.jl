@@ -7,8 +7,7 @@ using LinearAlgebra
 using Random
 # adjust this path as neccessary
 push!(LOAD_PATH, "../../../JuBasicMD/src")
-using JuBasicMD: MALA, MALA!
-using JuBasicMD: EM, EM!
+using JuBasicMD
 using ForwardDiff
 using Optim
 using StaticArrays
@@ -44,3 +43,5 @@ nΔt = Int(T/Δt);
 # define observable as the indicator function on B = {x∣ |x-xt|≤r}
 r = 0.5;
 f = X-> Int(norm(X.-xt)≤r);
+
+sampler = MALA(V,∇V!, β, Δt);

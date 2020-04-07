@@ -43,10 +43,13 @@ function rebin!(E, B, t)
     E, B
 end
 
-# mutation = X-> EM(X,∇V!,β, Δt, Int(nΔt/n_we_steps), return_trajectory=false);
-# mutation! = X-> EM!(X,∇V!,β, Δt, Int(nΔt/n_we_steps));
-mutation = X-> MALA(X,V, ∇V!,β, Δt, Int(nΔt/n_we_steps), return_trajectory=false)[1];
-mutation! = X-> MALA!(X,V, ∇V!,β, Δt, Int(nΔt/n_we_steps));
+opts = Options(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
+function mutation(x)
+    Xvals, _ = sample_trajectory(x, sampler, options=opts);
+    return Xvals[end]
+end
+mutation! = x-> sample_trajectory!(x, sampler, options=opts);
+
 
 # construct coarse model
 Random.seed!(100);

@@ -37,8 +37,12 @@ function rebin!(E, B, t)
 end
 
 # define the mutation mapping
-mutation = x-> MALA(x, V, gradV!, β, Δt, nΔt_coarse, return_trajectory=false)[1];
-mutation! = x-> MALA!(x, V, gradV!, β, Δt, nΔt_coarse);
+opts = Options(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
+function mutation(x)
+    Xvals, _ = sample_trajectory(x, sampler, options=opts);
+    return Xvals[end]
+end
+mutation! = x-> sample_trajectory!(x, sampler, options=opts);
 
 # construct coarse model matrix
 Random.seed!(100);

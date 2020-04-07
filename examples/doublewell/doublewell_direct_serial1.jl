@@ -8,13 +8,14 @@ using HypothesisTests
 using Printf
 
 include("doublewell_setup.jl");
+opts = Options(n_iters=nΔt)
 
 Random.seed!(100);
 n_trials = 10^4;
 n_in_set = 0;
 for j in 1:n_trials
     X = copy(x₀);
-    MALA!(X, V, gradV!, β, Δt, nΔt);
+    sample_trajectory!(X, sampler, options=opts);
     global n_in_set+= f(X);
 end
 CI = confint(BinomialTest(n_in_set, n_trials));

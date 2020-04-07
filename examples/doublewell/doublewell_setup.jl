@@ -7,7 +7,7 @@ using LinearAlgebra
 using Random
 # adjust this path as neccessary
 push!(LOAD_PATH, "../../../JuBasicMD/src")
-using JuBasicMD: MALA,MALA!
+using JuBasicMD
 
 function V(X)
     return (X⋅X - 1)^2;
@@ -23,6 +23,9 @@ b = 0.5;    # target set, (b, ∞)
 Δt = 1e-4;  # time step
 β = 5.0;    # inverse temperature
 T = 1.0;    # terminal time
-nΔt = Int(T/Δt);
+nΔt = ceil(Int, T/Δt);
 
 f = x-> Int(x[1]>b); # define observable
+
+# define sampler
+sampler = MALA(V, gradV!, β, Δt);

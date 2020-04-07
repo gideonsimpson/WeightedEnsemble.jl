@@ -11,12 +11,13 @@ using StatsBase
 using HypothesisTests
 using Printf
 @everywhere include("muller_setup.jl")
+opts = Options(n_iters=nΔt)
 
 Random.seed!(100)
 @everywhere n_trials = 10^4;
 n_in_set = @sync @distributed (+) for j in 1:n_trials
     X = copy(x₀);
-    EM!(X, ∇V!, β, Δt, nΔt);
+    sample_trajectory!(X, sampler, options=opts);
     f(X)
 end
 CI = confint(BinomialTest(n_in_set, n_trials));
