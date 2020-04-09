@@ -73,7 +73,7 @@ function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Sy
       for p in non_empty_bins
          # get particle indices for bin p
          particle_ids = findall(isequal(p), E.b);
-         E.o[particle_ids] = resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
+         E.o[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
       end
 
    else
