@@ -1,7 +1,6 @@
-abstract type AbstractBins end
 
 """
-`Bins{TS, TW<:AbstractFloat, TB<:Integer, TT<:Real}`: A bin structure designed for WE
+`Bins{TS, TW, TBI, TT}`: A bin structure designed for WE
 
 ### Fields
 
@@ -10,18 +9,18 @@ abstract type AbstractBins end
 * `target` - target number of particles in each bin
 * `ν` - weight of each bin
 """
-struct Bins{TS, TW<:AbstractFloat, TB<:Integer, TT<:Real} <: AbstractBins
+struct Bins{TS, TW<:AbstractFloat, TBI<:Integer, TT<:Real} <: AbstractBinsType
    # structure which identifies the bins
    Ω::Vector{TS}
    # number of walkers in each bin
-   n::Vector{TB}
+   n::Vector{TBI}
    # target number of walkers in each bin - specify if real/int with TT
    target::Vector{TT}
    # weight associated with each bin
    ν::Vector{TW}
 end
 
-function Base.push!(B::Bins, Ω, n, target, ν)
+function Base.push!(B::TB, Ω, n, target, ν) where {TB<:AbstractBinsType}
    push!(B.Ω, Ω);
    push!(B.n, n);
    push!(B.target, target);
@@ -29,7 +28,7 @@ function Base.push!(B::Bins, Ω, n, target, ν)
    #push!(B.particles, particles)
 end
 
-function Base.pop!(B::Bins)
+function Base.pop!(B::TB) where {TB<:AbstractBinsType}
    Ω = pop!(B.Ω);
    n = pop!(B.n);
    target = pop!(B.target);
@@ -38,7 +37,7 @@ function Base.pop!(B::Bins)
    return Ω, n, target, ν
 end
 
-function Base.popfirst!(B::Bins)
+function Base.popfirst!(B::TB) where {TB<:AbstractBinsType}
    Ω = popfirst!(B.Ω);
    n = popfirst!(B.n);
    target = popfirst!(B.target);
@@ -47,15 +46,15 @@ function Base.popfirst!(B::Bins)
    return Ω, n, target, ν
 end
 
-function Base.length(B::Bins)
+function Base.length(B::TB) where {TB<:AbstractBinsType}
    return length(B.Ω)
 end
 
-function Base.eltype(B::Bins)
+function Base.eltype(B::TB) where {TB<:AbstractBinsType}
    return typeof((B.Ω, B.n, B.target, B.ν))
 end
 
-function Base.iterate(B::Bins, state = 1)
+function Base.iterate(B::TB, state = 1) where {TB<:AbstractBinsType}
 
    if state > length(B)
       return nothing

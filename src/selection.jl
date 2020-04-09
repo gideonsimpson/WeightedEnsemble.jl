@@ -46,7 +46,7 @@ using a value function to approximate mutation variance.
 * `t` - t-th seletion step
 * `resample` - resampling scheme
 """
-function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) where{TE<:AbstractEnsemble, TB<:AbstractBins, F<:Function}
+function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) where{TE<:EnsembleWithBinsType, TB<:AbstractBinsType, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -106,7 +106,7 @@ positive bin weight has at least one offspring.
 * `B` - bin data structure
 * `resample` - resampling scheme
 """
-function uniform_selection!(E::TE, B::TB; resample=Systematic) where{TE<:AbstractEnsemble, TB<:AbstractBins}
+function uniform_selection!(E::TE, B::TB; resample=Systematic) where{TE<:EnsembleWithBinsType, TB<:AbstractBinsType}
    n_particles = length(E);
    n_bins = length(B);
    # zero out offspring counts

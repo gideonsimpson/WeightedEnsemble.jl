@@ -62,7 +62,7 @@ v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
 selection! = (E, B, t)-> JuWeightedEnsemble.optimal_allocation_selection!(E, B, v², t)
 
 # set up ensemble
-E₀ = JuWeightedEnsemble.Dirac_to_Ensemble(x₀, n_particles);
+E₀ = JuWeightedEnsemble.Dirac_to_EnsembleWithBins(x₀, n_particles);
 rebin!(E₀, B₀, 0);
 
 # run
