@@ -14,7 +14,7 @@ designed for WE with bins.
 * `b` - particle bin after mutation
 * `o` - number of offspring of the particle
 """
-struct EnsembleWithBins{TP, TF<:AbstractFloat, TI<:Integer} <: EnsembleWithBinsType
+struct EnsembleWithBins{TP, TF<:AbstractFloat, TI<:Integer} <: AbstractEnsemble
    # positions of the walkers after selection, before mutation
    ξ̂::Vector{TP}
    # positions of the walkers after mutation
@@ -31,11 +31,11 @@ struct EnsembleWithBins{TP, TF<:AbstractFloat, TI<:Integer} <: EnsembleWithBinsT
    o::Vector{TI}
 end
 
-function Base.eltype(E::TE) where {TE<:EnsembleWithBinsType}
+function Base.eltype(E::TE) where {TE<:EnsembleWithBins}
    return typeof((E.ξ̂[1], E.ξ[1], E.ω̂[1], E.ω[1],E.b̂[1], E.b[1],E.o[1]))
 end
 
-function Base.push!(E::TE, ξ̂, ξ, ω̂, ω, b̂, b, o) where {TE<:EnsembleWithBinsType}
+function Base.push!(E::TE, ξ̂, ξ, ω̂, ω, b̂, b, o) where {TE<:EnsembleWithBins}
    push!(E.ξ̂, ξ̂);
    push!(E.ξ, ξ);
    push!(E.ω̂, ω̂);
@@ -45,7 +45,7 @@ function Base.push!(E::TE, ξ̂, ξ, ω̂, ω, b̂, b, o) where {TE<:EnsembleWit
    push!(E.o, o)
 end
 
-function Base.pop!(E::TE) where {TE<:EnsembleWithBinsType}
+function Base.pop!(E::TE) where {TE<:EnsembleWithBins}
    ξ̂ = pop!(E.ξ̂);
    ξ = pop!(E.ξ);
    ω̂ = pop!(E.ω̂);
@@ -56,7 +56,7 @@ function Base.pop!(E::TE) where {TE<:EnsembleWithBinsType}
    return ξ̂, ξ, ω̂, ω, b̂, b, o
 end
 
-function Base.popfirst!(E::TE) where {TE<:EnsembleWithBinsType}
+function Base.popfirst!(E::TE) where {TE<:EnsembleWithBins}
    ξ̂ = popfirst!(E.ξ̂);
    ξ = popfirst!(E.ξ);
    ω̂ = popfirst!(E.ω̂);
@@ -67,7 +67,7 @@ function Base.popfirst!(E::TE) where {TE<:EnsembleWithBinsType}
    return ξ̂, ξ, ω̂, ω, b̂, b, o
 end
 
-function Base.iterate(E::TE, state = 1) where {TE<:EnsembleWithBinsType}
+function Base.iterate(E::TE, state = 1) where {TE<:EnsembleWithBins}
 
    if state > length(E)
       return nothing

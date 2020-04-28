@@ -1,5 +1,5 @@
-abstract type AbstractEnsembleType end
-abstract type EnsembleWithBinsType <: AbstractEnsembleType end
-abstract type EnsembleWithoutBinsType<: AbstractEnsembleType end
+# abstract type declarations
 
-abstract type AbstractBinsType end
+abstract type AbstractEnsemble end
+
+abstract type AbstractBins end

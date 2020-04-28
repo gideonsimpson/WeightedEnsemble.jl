@@ -11,7 +11,7 @@ using StatsBase
 using HypothesisTests
 using Printf
 @everywhere include("muller_setup.jl")
-opts = Options(n_iters=nΔt)
+opts = MDOptions(n_iters=nΔt)
 
 Random.seed!(100)
 @everywhere n_trials = 10^4;

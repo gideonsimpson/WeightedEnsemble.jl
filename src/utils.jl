@@ -7,7 +7,7 @@
 * `B` - bin data structure
 * `E` - particle ensemble
 """
-function update_bin_weights!(B::TB, E::TE) where {TB<:AbstractBinsType, TE<:EnsembleWithBinsType}
+function update_bin_weights!(B::TB, E::TE) where {TB<:AbstractBins, TE<:EnsembleWithBins}
 
    n_particles = length(E);
    n_bins = length(B);

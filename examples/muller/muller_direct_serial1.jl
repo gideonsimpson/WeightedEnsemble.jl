@@ -8,7 +8,7 @@ using HypothesisTests
 using Printf
 
 include("muller_setup.jl");
-opts = Options(n_iters=nΔt)
+opts = MDOptions(n_iters=nΔt)
 
 Random.seed!(100);
 n_trials = 10^4;

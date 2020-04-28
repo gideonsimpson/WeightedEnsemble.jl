@@ -27,6 +27,6 @@ include("utils.jl")
 # Load WE methods
 include("we.jl")
 
-export EnsembleWithBins, Bins, EnsembleWithoutBins, Bins
+export EnsembleWithBins, Bins, EnsembleWithoutBins
 
 end # end module

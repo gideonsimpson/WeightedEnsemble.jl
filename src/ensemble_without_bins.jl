@@ -13,7 +13,7 @@ designed for WE without bins.
 * `ρ` - particle resampling weight
 * `o` - number of offspring of the particle
 """
-struct EnsembleWithoutBins{TP, TF<:AbstractFloat, TI<:Integer} <: EnsembleWithoutBinsType
+struct EnsembleWithoutBins{TP, TF<:AbstractFloat, TI<:Integer} <: AbstractEnsemble
    # positions of the walkers after selection, before mutation
    ξ̂::Vector{TP}
    # positions of the walkers after mutation
@@ -28,11 +28,11 @@ struct EnsembleWithoutBins{TP, TF<:AbstractFloat, TI<:Integer} <: EnsembleWithou
    o::Vector{TI}
 end
 
-function Base.eltype(E::TE) where {TE<:EnsembleWithoutBinsType}
+function Base.eltype(E::TE) where {TE<:EnsembleWithoutBins}
    return typeof((E.ξ̂[1], E.ξ[1], E.ω̂[1], E.ω[1], E.ρ[1], E.o[1]))
 end
 
-function Base.push!(E::TE, ξ̂, ξ, ω̂, ω, ρ, o) where {TE<:EnsembleWithoutBinsType}
+function Base.push!(E::TE, ξ̂, ξ, ω̂, ω, ρ, o) where {TE<:EnsembleWithoutBins}
    push!(E.ξ̂, ξ̂);
    push!(E.ξ, ξ);
    push!(E.ω̂, ω̂);
@@ -41,7 +41,7 @@ function Base.push!(E::TE, ξ̂, ξ, ω̂, ω, ρ, o) where {TE<:EnsembleWithout
    push!(E.o, o)
 end
 
-function Base.pop!(E::TE) where {TE<:EnsembleWithoutBinsType}
+function Base.pop!(E::TE) where {TE<:EnsembleWithoutBins}
    ξ̂ = pop!(E.ξ̂);
    ξ = pop!(E.ξ);
    ω̂ = pop!(E.ω̂);
@@ -51,7 +51,7 @@ function Base.pop!(E::TE) where {TE<:EnsembleWithoutBinsType}
    return ξ̂, ξ, ω̂, ω, ρ, o
 end
 
-function Base.popfirst!(E::TE) where {TE<:EnsembleWithoutBinsType}
+function Base.popfirst!(E::TE) where {TE<:EnsembleWithoutBins}
    ξ̂ = popfirst!(E.ξ̂);
    ξ = popfirst!(E.ξ);
    ω̂ = popfirst!(E.ω̂);
@@ -61,7 +61,7 @@ function Base.popfirst!(E::TE) where {TE<:EnsembleWithoutBinsType}
    return ξ̂, ξ, ω̂, ω, ρ, o
 end
 
-function Base.iterate(E::TE, state = 1) where {TE<:EnsembleWithoutBinsType}
+function Base.iterate(E::TE, state = 1) where {TE<:EnsembleWithoutBins}
 
    if state > length(E)
       return nothing

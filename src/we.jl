@@ -12,7 +12,7 @@
 * `n_we_steps` - number of steps in the WE run
 """
 function run_we!(E::TE, B::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int) where
-   {TE<:EnsembleWithBinsType, TB<:AbstractBinsType, FM<:Function, FS<:Function, FR<:Function}
+   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function}
 
    for t in 0:n_we_steps-1
       # first selection is at t = 0
@@ -37,7 +37,7 @@ end
 * `n_we_steps` - number of steps in the WE run
 """
 function run_we!(E::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int) where
-   {TE<:AbstractEnsembleType, FM<:Function, FS<:Function, FA<:Function}
+   {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function}
 
    for t in 0:n_we_steps-1
       # first selection is at t = 0
@@ -64,7 +64,7 @@ in parallel, and assumes a worker pool has already been created.
 * `n_we_steps` - number of steps in the WE run
 """
 function prun_we!(E::TE, B::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int) where
-   {TE<:EnsembleWithBinsType, TB<:AbstractBinsType, FM<:Function, FS<:Function, FR<:Function}
+   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function}
 
    for t in 0:n_we_steps-1
       # first selection is at t = 0
@@ -91,15 +91,15 @@ in parallel, and assumes a worker pool has already been created.
 * `n_we_steps` - number of steps in the WE run
 """
 function prun_we!(E::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int) where
-   {TE<:AbstractEnsembleType, FM<:Function, FS<:Function, FA<:Function}
+   {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function}
 
    for t in 0:n_we_steps-1
       # first selection is at t = 0
-      selection!(E, B, t);
+      selection!(E, t);
       @. E.ω = E.ω̂
       E.ξ .= pmap(mutation, E.ξ̂);
       # after mutation, time is t ↦ t+1
-      analysis!(E, B, t+1);
+      analysis!(E, t+1);
    end
    E, B
 

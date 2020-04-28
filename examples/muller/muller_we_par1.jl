@@ -47,7 +47,7 @@ function rebin!(E, B, t)
 end
 
 # define the mutation mapping
-opts = Options(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
+opts = MDOptions(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
 @everywhere function mutation(x)
     Xvals, _ = sample_trajectory(x, sampler, options=opts);
     return Xvals[end]
