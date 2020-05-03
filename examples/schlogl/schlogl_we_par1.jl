@@ -14,7 +14,7 @@ using Printf
 
 
 # number of coarse steps in WE
-@everywhere n_we_steps = 10;
+@everywhere n_we_steps = 20;
 # number of time steps during mutation step
 @everywhere T_coarse = Tmax/n_we_steps;
 # number of samples in coarse matrix
@@ -23,7 +23,7 @@ n_samples_per_bin = 10^2;
 n_particles = 10^2;
 
 # define bin structure
-@everywhere voronoi_pts = [[x] for x in 10:10:100];
+@everywhere voronoi_pts = [[x] for x in 5:5:100];
 B₀ = JuWeightedEnsemble.Voronoi_to_Bins(voronoi_pts);
 @everywhere tree = KDTree(hcat(float.(voronoi_pts)...));
 
