@@ -1,6 +1,15 @@
 #=
-Direct estimation of the probability for the Schlögl chemical reaction network
-with X(0)= x₀ to reach X(T) ∈ A.
+Setup for estimation of the probability for the Schlögl chemical reaction network
+with X(0)= x₀ to reach X(T) ∈ A, the target set.
+
+This reaction network corresponds to:
+A + 2S → 3S
+3S → A + 2S
+B → S
+S → B
+
+Parameters were chosen so that the system is bistable, as in:
+https://doi.org/10.1063/1.5017955
 =#
 
 using LinearAlgebra

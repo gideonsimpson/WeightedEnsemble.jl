@@ -1,4 +1,4 @@
-module JuWeightedEnsemble
+module WeightedEnsemble
 
 using LinearAlgebra
 using SparseArrays

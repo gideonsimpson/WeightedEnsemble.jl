@@ -1,4 +1,4 @@
-# JuWeightedEnsemble
+# WeightedEnsemble
 Julia Implementation of the Weighted Ensemble Algorithm
 
 # Overview
@@ -32,6 +32,8 @@ overdamped Langevin equation.
 minimum to another in a specified time.  This version uses the overdamped
 Langevin equation.
 
+* The Schlögl reaction rate network.  This version has parameters chosen so as to be bistable with resevoirs for species A and B.  Parameters were taken from Wang and Plecháč (2017).
+
 # Notes
 
 * The code is currently implemented for problems where the underlying problem is time homogeneous.  Thus, the `mutation` function should only take the current state as its argument.  However, both the `selection!` and `rebin!` functions will take the algorithmic time as an argument.  This is relevant for computing certain QoI and for adaptive binning strategies.
@@ -39,15 +41,16 @@ Langevin equation.
 # Caveats
 
 * The mutation step in the provided examples make use of [`JuBasicMD`](https://github.com/gideonsimpson/JuBasicMD)
+* The mutation step in the Schlögl example code makes use of [`DiffEqBiological`](https://github.com/SciML/DiffEqBiological.jl)
 
 # TO DO
 
-* Provide examples of steady state (reaction rate) problems
+* Modify code to handle and provide examples of steady state (reaction rate) problems
 * Provide additional examples
 
 # References
 
 1. _Analysis and optimization of weighted ensemble sampling_, D. Aristoff, ESAIM: M2AN, 52(4), 1219 - 1238, 2018. [(Link)](https://www.esaim-m2an.org/articles/m2an/abs/2018/04/m2an160145/m2an160145.html)
-
 2. _Optimizing weighted ensemble sampling of steady states_, D. Aristoff and D.M. Zuckerman, arXiv:1806.00860. [(Link)](https://arxiv.org/abs/1806.00860)
 3. _An ergodic theorem for weighted ensemble_, D. Aristoff, arXiv:1906.00856. [(Link)](https://arxiv.org/abs/1906.00856)
+4. _Parallel replica dynamics method for bistable stochastic reaction networks: Simulation and sensitivity analysis_, T. Wang and P. Plecháč, J. Chem. Phys., 147, 234110, 2017. [(Link)](https://doi.org/10.1063/1.5017955)
