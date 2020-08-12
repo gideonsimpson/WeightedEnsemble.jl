@@ -66,7 +66,7 @@ end
 
 """
 `build_coarse_vectors`: Assemble the conditional expectation and 1- step
-variance approximations one a coarser model, given the transition matrix, `K̃`,
+variance approximations on a coarser model, given the transition matrix, `K̃`,
 and a coarse scale QoI function, `f̃`.
 
 ### Arguments
