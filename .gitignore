@@ -31,3 +31,6 @@ Manifest.toml
 *.log
 *.out
 *.synctex.*
+
+# scratch folder
+scratch/
