@@ -99,3 +99,33 @@ function build_coarse_vectors(n_we_steps, K̃, f̃)
 
    return h̃_vals, ṽ²_vals
 end
+
+
+"""
+`build_coarse_poisson`: Construct the solution to the Poisson problem and the
+1-step variance approximation on the coarser model given the transition matrix,
+`K̃`, and a coarse scale QoI function, `f̃`.
+
+### Arguments
+* `K̃` - coarse scale transition matrix
+* `f̃` - quantity of interest vector on the bin space
+"""
+function build_coarse_poisson(K̃, f̃)
+
+   n_bins = length(f̃);
+   _, evecs  = eigs(transpose(K̃),nev=1);
+   μ̃ = real.(evecs[:,1]);μ̃ .= μ̃/ sum(μ̃); #normalize the invariant measure
+
+   # compute solution to Poisson
+   h̃ = (I - K̃)\(f̃ .- μ̃ ⋅ f̃); 
+   # normalize
+   h̃ = h̃ .- μ̃⋅h̃;
+   K̃h̃ = K̃*h̃;
+   e = ones(n_bins);
+   ṽ² =zeros(n_bins);
+   for p in 1:n_bins
+      ṽ²[p] = K̃[p,:]⋅((h̃ .- e * (K̃h̃[p])).^2)
+   end
+
+   return h̃, ṽ²
+end

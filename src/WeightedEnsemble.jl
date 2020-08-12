@@ -8,6 +8,7 @@ using Distributed
 using SharedArrays
 using StatsBase
 using Distributions
+using Arpack
 
 # Load types
 include("types.jl")
