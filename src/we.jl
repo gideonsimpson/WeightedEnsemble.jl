@@ -81,6 +81,72 @@ function run_we(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_step
 
 end
 
+""" `run_we_observable`: Run a serial WE simulation, returning the values a
+specified fucntion, `f`, along the trajecotry.
+
+### Arguments
+* `E₀` - initial particle ensemble
+* `B₀` - initial bin data structure
+* `mutation` - mutation function
+* `selection!` - selection scheme
+* `rebin!` - rebin and update particles and bins
+* `n_we_steps` - number of steps in the WE run
+* `f` - Observable function for the ergodic average
+"""
+function run_we_observable(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int, f::FO) where
+   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, FO:<:Function}
+
+   E = deepcopy(E₀);
+   B = deepcopy(B₀);
+   f_trajectory = zeros(n_we_steps);
+
+   
+   for t in 0:n_we_steps-1
+      # first selection is at t = 0
+      selection!(E, B, t);
+      @. E.ω = E.ω̂;
+      @. E.ξ = mutation(E.ξ̂);
+      # after mutation, time is t ↦ t+1
+      rebin!(E, B, t+1);
+      f_trajectory[t] = f.(E.ξ) ⋅ E.ω;
+   end
+
+   return f_trajectory
+
+end
+
+""" `run_we_observable`: Run a serial WE simulation, returning the values a
+specified fucntion, `f`, along the trajecotry.
+
+
+### Arguments
+* `E₀` - initial particle ensemble
+* `mutation` - mutation function
+* `selection!` - selection scheme
+* `analysis!` - perform any post mutation updates
+* `n_we_steps` - number of steps in the WE run
+* `save_trajectory=true` - save the ensemble and bins at each iteration.  if false, only returns the final state
+"""
+function run_we_observable(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int, f::FO) where
+   {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function,FO:<:Function}
+
+   E = deepcopy(E₀);
+   f_trajectory = zeros(n_we_steps);
+
+   for t in 0:n_we_steps-1
+      # first selection is at t = 0
+      selection!(E, B, t);
+      @. E.ω = E.ω̂;
+      @. E.ξ = mutation(E.ξ̂);
+      # after mutation, time is t ↦ t+1
+      analysis!(E, t+1);
+      f_trajectory[t] = f.(E.ξ) ⋅ E.ω;
+   end
+
+   return f_trajectory
+
+end
+
 
 """
 `run_we!`: Run an in place serial WE simulation with
