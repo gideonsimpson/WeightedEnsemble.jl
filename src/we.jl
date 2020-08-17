@@ -43,7 +43,8 @@ function run_we(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_
 
 end
 
-""" `run_we`: Run a serial WE simulation, optionally returning the ensemble at
+""" 
+`run_we`: Run a serial WE simulation, optionally returning the ensemble at
 each, step with
 
 ### Arguments
@@ -81,7 +82,8 @@ function run_we(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_step
 
 end
 
-""" `run_we_observable`: Run a serial WE simulation, returning the values a
+""" 
+`run_we_observable`: Run a serial WE simulation, returning the values a
 specified fucntion, `f`, along the trajecotry.
 
 ### Arguments
@@ -94,7 +96,7 @@ specified fucntion, `f`, along the trajecotry.
 * `f` - Observable function for the ergodic average
 """
 function run_we_observable(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int, f::FO) where
-   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, FO:<:Function}
+   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, FO<:Function}
 
    E = deepcopy(E₀);
    B = deepcopy(B₀);
@@ -108,7 +110,7 @@ function run_we_observable(E₀::TE, B₀::TB, mutation::FM, selection!::FS, reb
       @. E.ξ = mutation(E.ξ̂);
       # after mutation, time is t ↦ t+1
       rebin!(E, B, t+1);
-      f_trajectory[t] = f.(E.ξ) ⋅ E.ω;
+      f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
    end
 
    return f_trajectory
@@ -128,7 +130,7 @@ specified fucntion, `f`, along the trajecotry.
 * `save_trajectory=true` - save the ensemble and bins at each iteration.  if false, only returns the final state
 """
 function run_we_observable(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int, f::FO) where
-   {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function,FO:<:Function}
+   {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function, FO<:Function}
 
    E = deepcopy(E₀);
    f_trajectory = zeros(n_we_steps);
@@ -140,7 +142,7 @@ function run_we_observable(E₀::TE, mutation::FM, selection!::FS, analysis!::FA
       @. E.ξ = mutation(E.ξ̂);
       # after mutation, time is t ↦ t+1
       analysis!(E, t+1);
-      f_trajectory[t] = f.(E.ξ) ⋅ E.ω;
+      f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
    end
 
    return f_trajectory
