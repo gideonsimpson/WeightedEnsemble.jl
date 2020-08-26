@@ -44,10 +44,6 @@ function rebin!(E, B, t)
 end
 
 opts = MDOptions(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
-function mutation(x)
-    Xvals, _ = sample_trajectory(x, sampler, options=opts);
-    return Xvals[end]
-end
 mutation! = x-> sample_trajectory!(x, sampler, options=opts);
 
 
@@ -73,6 +69,6 @@ rebin!(E₀, B₀, 0);
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-WeightedEnsemble.run_we!(E, B, mutation,selection!, rebin!, n_we_steps);
+WeightedEnsemble.run_we!(E, B, mutation!, selection!, rebin!, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)
