@@ -23,6 +23,23 @@ function update_bin_weights!(B::TB, E::TE) where {TB<:AbstractBins, TE<:Ensemble
 end
 
 """
+`Points_to_Bins`: Convenience function for constructing a bin structure using a
+sequence of points
+
+### Arguments
+`points` - An array of points defining the Voronoi cells
+"""
+function Points_to_Bins(points)
+
+   B = Bins{typeof(points[1]), Float64, Int, Int}([],[],[],[]);
+   for point in points
+      push!(B, point , 0, 0, 0);
+   end
+   return B
+end
+
+
+"""
 `Voronoi_to_Bins`: Convenience function for constructing a bin structure using a
 sequence of points as the Voronoi sites
 
