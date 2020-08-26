@@ -34,3 +34,6 @@ Manifest.toml
 
 # scratch folder
 scratch/
+
+# vs code folder
+.vscode/*

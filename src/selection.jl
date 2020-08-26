@@ -51,7 +51,6 @@ function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Sy
       # identify the bin of the current particle
       bin = E.b[i];
       for k in 1:E.o[i]
-         # E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          copy!(E.ξ̂[k+n_spawned], E.ξ[i]);
          E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
          E.b̂[k+n_spawned] = bin;
@@ -95,7 +94,7 @@ function uniform_selection!(E::TE, B::TB; resample=Systematic) where{TE<:Ensembl
       # identify the bin of the current particle
       bin = E.b[i];
       for k in 1:E.o[i]
-         E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
+         copy!(E.ξ̂[k+n_spawned], E.ξ[i]);
          E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
          E.b̂[k+n_spawned] = bin;
       end

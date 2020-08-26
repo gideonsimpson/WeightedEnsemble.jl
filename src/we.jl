@@ -31,8 +31,6 @@ function run_we(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n
       copy!(E.ω, E.ω̂);
       copy!.(E.ξ, E.ξ̂);
       mutation!.(E.ξ);
-      # @. E.ω = E.ω̂;
-      # @. E.ξ = mutation(E.ξ̂);
       # after mutation, time is t ↦ t+1
       rebin!(E, B, t+1);
 
@@ -71,8 +69,6 @@ function run_we(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_ste
    for t in 0:n_we_steps-1
       # first selection is at t = 0
       selection!(E, B, t);
-      # @. E.ω = E.ω̂;
-      # @. E.ξ = mutation(E.ξ̂);
       copy!(E.ω, E.ω̂);
       copy!.(E.ξ, E.ξ̂);
       mutation!.(E.ξ);
@@ -115,9 +111,6 @@ function run_we_observable(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, re
       copy!(E.ω, E.ω̂);
       copy!.(E.ξ, E.ξ̂);
       mutation!.(E.ξ);
-      # @. E.ω = E.ω̂;
-      # @. E.ξ =E.ξ̂;
-      # @. E.ξ = mutation(E.ξ̂);
       # after mutation, time is t ↦ t+1
       rebin!(E, B, t+1);
       f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
@@ -178,8 +171,6 @@ function run_we!(E::TE, B::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_s
    for t in 0:n_we_steps-1
       # first selection is at t = 0
       selection!(E, B, t);
-      # @. E.ω = E.ω̂;
-      # @. E.ξ = mutation(E.ξ̂);
       copy!(E.ω, E.ω̂);
       copy!.(E.ξ, E.ξ̂);
       mutation!.(E.ξ);
@@ -247,7 +238,6 @@ function prun_we(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n
    for t in 0:n_we_steps-1
       # first selection is at t = 0
       selection!(E, B, t);
-      # @. E.ω = E.ω̂;
       copy!(E.ω, E.ω̂);
       E.ξ .= pmap(mutation, E.ξ̂);
       # after mutation, time is t ↦ t+1
@@ -289,7 +279,6 @@ function prun_we(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_ste
    for t in 0:n_we_steps-1
       # first selection is at t = 0
       selection!(E, B, t);
-      # @. E.ω = E.ω̂;
       copy!(E.ω, E.ω̂);
       E.ξ .= pmap(mutation, E.ξ̂);
       # after mutation, time is t ↦ t+1
@@ -328,7 +317,6 @@ function prun_we_observable(E₀::TE, B₀::TB, mutation::FM, selection!::FS, re
    for t in 0:n_we_steps-1
       # first selection is at t = 0
       selection!(E, B, t);
-      # @. E.ω = E.ω̂;
       copy!(E.ω, E.ω̂);
       E.ξ .= pmap(mutation, E.ξ̂);
       # after mutation, time is t ↦ t+1
@@ -362,7 +350,6 @@ function prun_we_observable(E₀::TE, mutation::FM, selection!::FS, analysis!::F
    for t in 0:n_we_steps-1
       # first selection is at t = 0
       selection!(E, B, t);
-      # @. E.ω = E.ω̂;
       copy!(E.ω, E.ω̂);
       E.ξ .= pmap(mutation, E.ξ̂);
       # after mutation, time is t ↦ t+1
@@ -392,7 +379,6 @@ function prun_we!(E::TE, B::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_s
    for t in 0:n_we_steps-1
       # first selection is at t = 0
       selection!(E, B, t);
-      # @. E.ω = E.ω̂
       copy!(E.ω, E.ω̂);
       E.ξ .= pmap(mutation, E.ξ̂);
       # after mutation, time is t ↦ t+1
@@ -420,7 +406,6 @@ function prun_we!(E::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps
    for t in 0:n_we_steps-1
       # first selection is at t = 0
       selection!(E, t);
-      # @. E.ω = E.ω̂
       copy!(E.ω, E.ω̂);
       E.ξ .= pmap(mutation, E.ξ̂);
       # after mutation, time is t ↦ t+1
