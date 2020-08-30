@@ -26,7 +26,9 @@ include("coarse.jl")
 # Load utility functions
 include("utils.jl")
 # Load WE methods
-include("we.jl")
+include("we_serial.jl")
+include("we_parallel.jl")
+include("we_threads.jl")
 
 export EnsembleWithBins, Bins, EnsembleWithoutBins
 
