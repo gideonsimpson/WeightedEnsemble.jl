@@ -24,7 +24,7 @@ function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Sy
 
    for p in non_empty_bins
       particle_ids = findall(isequal(p), E.b);
-      @inbounds Ñ[p] = sqrt(B.ν[p] * sum(E.ω[particle_ids] .* v².(E.ξ[particle_ids],t)));
+      @inbounds Ñ[p] = sqrt(B.ν[p] * (E.ω[particle_ids] ⋅ v².(E.ξ[particle_ids],t)));
    end
 
    if(sum(Ñ)>0)
@@ -41,7 +41,7 @@ function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Sy
 
    else
       # every particle copies itself
-      B.target .= B.n;
+      @. B.target = B.n;
       @. E.o = 1;
    end
 
