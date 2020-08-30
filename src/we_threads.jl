@@ -1,7 +1,8 @@
 # WE routines
 
-""" `trun_we`: Run a multithreaded WE simulation, optionally returning the ensemble at
-each, step with
+""" 
+`trun_we`: Run a multithreaded WE simulation, optionally returning the
+ensemble at each, step with
 
 ### Arguments
 * `E₀` - initial particle ensemble
@@ -50,8 +51,8 @@ function trun_we(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, 
 end
 
 """ 
-`trun_we`: Run a serial WE simulation, optionally returning the ensemble at
-each, step with
+`trun_we`: Run a multithreaded WE simulation, optionally returning the ensemble
+at each, step with
 
 ### Arguments
 * `E₀` - initial particle ensemble
@@ -95,7 +96,7 @@ function trun_we(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_st
 end
 
 """ 
-`trun_we_observable`: Run a serial WE simulation, returning the values a
+`trun_we_observable`: Run a multithreaded WE simulation, returning the values a
 specified fucntion, `f`, along the trajecotry.
 
 ### Arguments
@@ -133,8 +134,9 @@ function trun_we_observable(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, r
 
 end
 
-""" `trun_we_observable`: Run a serial WE simulation, returning the values a
-specified fucntion, `f`, along the trajecotry.
+""" 
+`trun_we_observable`: Run a multithreaded WE simulation, returning the
+values a specified fucntion, `f`, along the trajecotry.
 
 
 ### Arguments
@@ -173,7 +175,7 @@ end
 
 
 """
-`trun_we!`: Run an in place serial WE simulation with
+`trun_we!`: Run an in place multithreaded WE simulation with
 
 ### Arguments
 * `E` - particle ensemble
@@ -204,7 +206,7 @@ function trun_we!(E::TE, B::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_
 end
 
 """
-`trun_we!`: Run an in place serial WE simulation with
+`trun_we!`: Run an in place multithreaded WE simulation with
 
 ### Arguments
 * `E` - particle ensemble
