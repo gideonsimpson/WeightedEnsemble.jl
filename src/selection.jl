@@ -21,6 +21,7 @@ function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Sy
    non_empty_bins = findall(n->n>0, B.n);
    R = length(non_empty_bins);
    Ñ = zeros(n_bins);
+   ρ = zeros(n_bins);
 
    for p in non_empty_bins
       particle_ids = findall(isequal(p), E.b);
@@ -28,9 +29,9 @@ function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Sy
    end
 
    if(sum(Ñ)>0)
-      # normalize
-      Ñ .= n_particles * Ñ/sum(Ñ);
-      B.target .= (B.n .>0) .+ resample(n_particles-R, Ñ./n_particles);
+      # compute probabilities
+      ρ .= Ñ/sum(Ñ);
+      B.target .= (B.n .>0) .+ resample(n_particles-R, ρ);
 
       # compute number of offspring of each particle bin by bin
       for p in non_empty_bins
