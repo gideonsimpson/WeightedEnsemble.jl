@@ -48,6 +48,9 @@ Langevin equation.
 * Modify code to handle and provide examples of steady state (reaction rate) problems
 * Provide additional examples
 
+# Acknowledgements
+This work was supported in part by the US National Science Foundation Grant DMS-1818716.
+
 # References
 
 1. _Analysis and optimization of weighted ensemble sampling_, D. Aristoff, ESAIM: M2AN, 52(4), 1219 - 1238, 2018. [(Link)](https://www.esaim-m2an.org/articles/m2an/abs/2018/04/m2an160145/m2an160145.html)
