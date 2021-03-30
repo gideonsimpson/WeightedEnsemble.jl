@@ -97,7 +97,7 @@ specified fucntion, `f`, along the trajecotry.
 * `n_we_steps` - number of steps in the WE run
 * `f` - Observable function for the ergodic average
 """
-@generated function run_we_observable(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, f::::Tuple{Vararg{<:Function,NO}}) where
+@generated function run_we_observable(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, f::Tuple{Vararg{<:Function,NO}}) where
    {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, NO}
 
    quote
