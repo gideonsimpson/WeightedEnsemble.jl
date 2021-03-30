@@ -27,9 +27,14 @@ include("coarse.jl")
 include("utils.jl")
 # Load WE methods
 include("we_serial.jl")
+export run_we, run_we!, run_we_observable
 include("we_parallel.jl")
+export prun_we, prun_we!, prun_we_observable
 include("we_threads.jl")
+export trun_we, trun_we!, trun_we_observable
 
 export EnsembleWithBins, Bins, EnsembleWithoutBins
+
+
 
 end # end module

@@ -21,6 +21,11 @@ Parallel versions of the construction of the coarse transition matrix and the ac
 
 More details on the algorithm are described in ``WE_description.pdf``, which may be found in the `doc` folder.
 
+This package can be added to a Julia environment with the command:
+```
+(@v1.XYZ) pkg> add https://github.com/gideonsimpson/WeightedEnsemble.jl
+
+```
 # Examples
 
 * The double well potential in dimension one, where we estimate the probability of
@@ -47,6 +52,7 @@ Langevin equation.
 
 * Modify code to handle and provide examples of steady state (reaction rate) problems
 * Provide additional examples
+* Update examples
 
 # Acknowledgements
 This work was supported in part by the US National Science Foundation Grant DMS-1818716.
