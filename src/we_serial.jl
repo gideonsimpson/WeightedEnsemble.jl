@@ -114,7 +114,7 @@ specified fucntion, `f`, along the trajecotry.
          mutation!.(E.ξ);
          # after mutation, time is t ↦ t+1
          rebin!(E, B, t+1);
-         # f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
+         f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
 
          Base.Cartesian.@nexprs $NO k -> f_trajectory[k,t+1] = (f[k]).(E.ξ) ⋅ E.ω;
 
