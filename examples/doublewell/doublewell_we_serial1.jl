@@ -8,10 +8,9 @@ using StatsBase
 using HypothesisTests
 using Printf
 using NearestNeighbors
+using WeightedEnsemble
 
 include("doublewell_setup.jl");
-push!(LOAD_PATH,"../../src/");
-using WeightedEnsemble
 
 # number of coarse steps in WE
 n_we_steps = 10;

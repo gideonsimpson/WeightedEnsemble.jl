@@ -10,13 +10,13 @@ using StatsBase
 using HypothesisTests
 using Printf
 
-# addprocs(4);
+# nw = 4; # number of workers
+# addprocs(nw);
 
 @everywhere using NearestNeighbors
+@everywhere using WeightedEnsemble
 
 @everywhere include("doublewell_setup.jl");
-@everywhere push!(LOAD_PATH,"../../src/");
-@everywhere using WeightedEnsemble
 
 # number of coarse steps in WE
 n_we_steps = 10;
