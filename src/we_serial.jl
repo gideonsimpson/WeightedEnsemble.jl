@@ -97,26 +97,31 @@ specified fucntion, `f`, along the trajecotry.
 * `n_we_steps` - number of steps in the WE run
 * `f` - Observable function for the ergodic average
 """
-function run_we_observable(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, f::FO) where
-   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, FO<:Function}
+@generated function run_we_observable(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, f::::Tuple{Vararg{<:Function,NO}}) where
+   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, NO}
 
-   E = deepcopy(E₀);
-   B = deepcopy(B₀);
-   f_trajectory = zeros(n_we_steps);
+   quote
+      E = deepcopy(E₀);
+      B = deepcopy(B₀);
+      f_trajectory = zeros($NO, n_we_steps);
 
-   
-   for t in 0:n_we_steps-1
-      # first selection is at t = 0
-      selection!(E, B, t);
-      copy!(E.ω, E.ω̂);
-      copy!.(E.ξ, E.ξ̂);
-      mutation!.(E.ξ);
-      # after mutation, time is t ↦ t+1
-      rebin!(E, B, t+1);
-      f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
+      
+      for t in 0:n_we_steps-1
+         # first selection is at t = 0
+         selection!(E, B, t);
+         copy!(E.ω, E.ω̂);
+         copy!.(E.ξ, E.ξ̂);
+         mutation!.(E.ξ);
+         # after mutation, time is t ↦ t+1
+         rebin!(E, B, t+1);
+         # f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
+
+         Base.Cartesian.@nexprs $NO k -> f_trajectory[k,t+1] = (f[k]).(E.ξ) ⋅ E.ω;
+
+      end
+
+      return f_trajectory
    end
-
-   return f_trajectory
 
 end
 
