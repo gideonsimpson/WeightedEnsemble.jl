@@ -7,7 +7,7 @@ using Distributed
 # nw = 4; # number of workers
 # addprocs(nw);
 
-using StatsBase
+using Statistics
 using HypothesisTests
 using Printf
 @everywhere include("muller_setup.jl")

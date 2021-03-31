@@ -4,10 +4,9 @@ X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
 =#
 
 
-using StatsBase
+using Statistics
 using HypothesisTests
 using Printf
-using NearestNeighbors
 using WeightedEnsemble
 
 include("doublewell_setup.jl");
@@ -23,17 +22,7 @@ n_particles = 10^2;
 
 # define bin structure
 voronoi_pts = [[x] for x in LinRange(a-.1,b+.1,21)];
-B₀ = WeightedEnsemble.Voronoi_to_Bins(voronoi_pts);
-tree = KDTree(hcat(voronoi_pts...));
-
-# define bin id mapping
-bin_id = x-> WeightedEnsemble.Voronoi_bin_id(x,tree);
-# define the rebinning function
-function rebin!(E, B, t)
-    @. E.b = bin_id(E.ξ);
-    WeightedEnsemble.update_bin_weights!(B, E);
-    E, B
-end
+B₀, bin_id, rebin! = setup_Voronoi_bins(voronoi_pts);
 
 # define the mutation mapping
 opts = MDOptions(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
@@ -62,6 +51,6 @@ rebin!(E₀, B₀, 0);
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-WeightedEnsemble.run_we!(E, B, mutation!, selection!, rebin!, n_we_steps);
+run_we!(E, B, mutation!, selection!, rebin!, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)

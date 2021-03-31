@@ -3,7 +3,7 @@ Direct estimation of the probability of for a diffusion with X(0) = x₀ satisfy
 X(T) ∈ B for the Muller potential.
 =#
 
-using StatsBase
+using Statistics
 using HypothesisTests
 using Printf
 

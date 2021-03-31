@@ -13,7 +13,7 @@ https://doi.org/10.1063/1.5017955
 =#
 
 using Distributed
-using StatsBase
+using Statistics
 using HypothesisTests
 using Printf
 

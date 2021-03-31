@@ -3,11 +3,9 @@ WE estimation of the probability of for a diffusion with X(0) = x₀ satisfying
 X(T) ∈ B for the Muller potential.
 =#
 
-
-using StatsBase
+using Statistics
 using HypothesisTests
 using Printf
-using NearestNeighbors
 
 include("muller_setup.jl");
 using WeightedEnsemble
@@ -31,16 +29,7 @@ for x in xc, y in yc
         push!(voronoi_pts, [x,y])
     end
 end
-B₀ = WeightedEnsemble.Voronoi_to_Bins(voronoi_pts);
-tree = KDTree(hcat(voronoi_pts...));
-
-bin_id = x-> WeightedEnsemble.Voronoi_bin_id(x,tree);
-# define the rebinning function
-function rebin!(E, B, t)
-    @. E.b = bin_id(E.ξ);
-    WeightedEnsemble.update_bin_weights!(B, E);
-    E, B
-end
+B₀, bin_id, rebin! = setup_Voronoi_bins(voronoi_pts);
 
 opts = MDOptions(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
 mutation! = x-> sample_trajectory!(x, sampler, options=opts);
@@ -68,6 +57,6 @@ rebin!(E₀, B₀, 0);
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-WeightedEnsemble.run_we!(E, B, mutation!, selection!, rebin!, n_we_steps);
+run_we!(E, B, mutation!, selection!, rebin!, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)

@@ -12,7 +12,7 @@ Parameters were chosen so that the system is bistable, as in:
 https://doi.org/10.1063/1.5017955
 =#
 
-using StatsBase
+using Statistics
 using HypothesisTests
 using Printf
 using NearestNeighbors

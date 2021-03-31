@@ -4,13 +4,11 @@ satisfying X(T) ∈ B for the Muller potential.
 =#
 
 using Distributed
-using StatsBase
+using Statistics
 using HypothesisTests
 using Printf
 
-# addprocs(4);
-
-@everywhere using NearestNeighbors
+addprocs(4);
 
 @everywhere include("muller_setup.jl");
 @everywhere using WeightedEnsemble
@@ -33,17 +31,7 @@ n_particles = 10^2;
         push!(voronoi_pts, [x,y])
     end
 end
-B₀ = WeightedEnsemble.Voronoi_to_Bins(voronoi_pts);
-@everywhere tree = KDTree(hcat(voronoi_pts...));
-
-# define bin id mapping
-@everywhere bin_id = x-> WeightedEnsemble.Voronoi_bin_id(x,tree);
-# define the rebinning function
-function rebin!(E, B, t)
-    @. E.b = bin_id(E.ξ);
-    WeightedEnsemble.update_bin_weights!(B, E);
-    E, B
-end
+@everywhere B₀, bin_id, rebin! = setup_Voronoi_bins(voronoi_pts);
 
 # define the mutation mapping
 opts = MDOptions(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
@@ -74,6 +62,6 @@ rebin!(E₀, B₀, 0);
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-WeightedEnsemble.prun_we!(E, B, mutation,selection!, rebin!, n_we_steps);
+prun_we!(E, B, mutation,selection!, rebin!, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)
