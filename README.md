@@ -45,7 +45,8 @@ Langevin equation.
 
 # Caveats
 
-* The mutation step in the provided examples make use of [`JuBasicMD`](https://github.com/gideonsimpson/JuBasicMD)
+* The mutation step in the provided examples make use of [`BasicMD`](https://github.com/gideonsimpson/BasicMD.jl)
+* One of the examples makes use of [`TestLandscapes`](https://github.com/gideonsimpson/TestLandscapes.jl)
 * The mutation step in the Schlögl example code makes use of [`DiffEqBiological`](https://github.com/SciML/DiffEqBiological.jl)
 
 # TO DO
