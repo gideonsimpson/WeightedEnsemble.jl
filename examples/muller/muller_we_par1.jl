@@ -13,7 +13,6 @@ using Printf
 @everywhere using NearestNeighbors
 
 @everywhere include("muller_setup.jl");
-@everywhere push!(LOAD_PATH,"../../src/");
 @everywhere using WeightedEnsemble
 
 # number of coarse steps in WE

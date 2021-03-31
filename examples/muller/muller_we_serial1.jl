@@ -10,7 +10,6 @@ using Printf
 using NearestNeighbors
 
 include("muller_setup.jl");
-push!(LOAD_PATH,"../../src/");
 using WeightedEnsemble
 
 # number of coarse steps in WE

@@ -5,9 +5,7 @@ satisfying X(T) ∈ B for the Muller potential.
 
 using LinearAlgebra
 using Random
-# adjust this path as neccessary
-push!(LOAD_PATH, "../../../JuBasicMD/src")
-using JuBasicMD
+using BasicMD
 using ForwardDiff
 using Optim
 using StaticArrays
