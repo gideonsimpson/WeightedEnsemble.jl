@@ -25,6 +25,7 @@ include("selection.jl")
 include("coarse.jl")
 # Load utility functions
 include("utils.jl")
+export setup_Voronoi_bins
 # Load WE methods
 include("we_serial.jl")
 export run_we, run_we!, run_we_observable

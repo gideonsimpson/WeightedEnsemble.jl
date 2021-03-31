@@ -67,6 +67,30 @@ function Voronoi_bin_id(X, tree)
 end
 
 """
+`setup_Voronoi_bins` - Convenience function for constructing bins, a bin id function,
+and a rebinning function based on a set of Voronoi points
+
+### Arguments
+`voronoi_pts` - User specified Voronoi cell centers
+"""
+function setup_Voronoi_bins(voronoi_pts)
+   # construct the bins
+   B = Voronoi_to_Bins(voronoi_pts);
+   # construct the bin id function
+   tree = KDTree(hcat(voronoi_pts...));
+   bin_id = x-> Voronoi_bin_id(x,tree);
+   # define the rebinning function
+   function rebin!(E, B, t)
+       @. E.b = bin_id(E.ξ);
+      update_bin_weights!(B, E);
+      E, B
+   end
+
+   return B, bin_id, rebin!
+
+end
+
+"""
 `Dirac_to_EnsembleWithoutBins`: Convenience function for construction an ensemble from a
 single initial walker.  This hard codes the weights to be Float64
 
