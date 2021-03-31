@@ -22,7 +22,6 @@ using Printf
 @everywhere using NearestNeighbors
 
 @everywhere include("schlogl_setup.jl");
-@everywhere push!(LOAD_PATH,"../../src/");
 @everywhere using WeightedEnsemble
 
 

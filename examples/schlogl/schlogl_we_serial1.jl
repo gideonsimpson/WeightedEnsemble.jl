@@ -19,7 +19,6 @@ using NearestNeighbors
 using LinearAlgebra
 
 include("schlogl_setup.jl");
-push!(LOAD_PATH,"../../src/");
 using WeightedEnsemble
 
 
