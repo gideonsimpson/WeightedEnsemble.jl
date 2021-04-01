@@ -95,7 +95,7 @@ specified fucntion, `f`, along the trajecotry.
 * `selection!` - selection scheme
 * `rebin!` - rebin and update particles and bins
 * `n_we_steps` - number of steps in the WE run
-* `observables` - Array of scalar observable functions for the ergodic average
+* `observables` - Tuple of scalar observable functions for the ergodic average
 """
 @generated function run_we_observables(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, NO}
@@ -121,7 +121,7 @@ specified fucntion, `f`, along the trajecotry.
 
 end
 
-""" `run_we_observable`: Run a serial WE simulation, returning the values a
+""" `run_we_observables`: Run a serial WE simulation, returning the values a
 specified fucntion, `f`, along the trajecotry.
 
 
@@ -131,7 +131,7 @@ specified fucntion, `f`, along the trajecotry.
 * `selection!` - selection scheme
 * `analysis!` - perform any post mutation updates
 * `n_we_steps` - number of steps in the WE run
-* `observables` - Array of scalar observable functions for the ergodic average
+* `observables` - Tuple of scalar observable functions for the ergodic average
 """
 @generated function run_we_observables(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function, NO}

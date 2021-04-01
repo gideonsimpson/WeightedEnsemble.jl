@@ -85,7 +85,7 @@ function prun_we(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_ste
 end
 
 """
-`prun_we_observable`: Run a parallel WE simulation, optionally returning the ensemble at
+`prun_we_observables`: Run a parallel WE simulation, optionally returning the ensemble at
 each step. This performs the mutation steps in parallel, and assumes a worker
 pool has already been created.
 
@@ -96,31 +96,33 @@ pool has already been created.
 * `selection!` - selection scheme
 * `rebin!` - rebin and update particles and bins
 * `n_we_steps` - number of steps in the WE run
-* `f` - Observable function for the ergodic average
+* `observables` - Tuple of scalar observable functions for the ergodic average
 """
-function prun_we_observable(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int, f::FO) where
-   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, FO<:Function}
+function prun_we_observables(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+   {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, NO}
 
-   E = deepcopy(E₀);
-   B = deepcopy(B₀);
-   f_trajectory = zeros(n_we_steps);
+   quote
+      E = deepcopy(E₀);
+      B = deepcopy(B₀);
+      observables_trajectory = zeros($NO, n_we_steps);
 
-   for t in 0:n_we_steps-1
-      # first selection is at t = 0
-      selection!(E, B, t);
-      copy!(E.ω, E.ω̂);
-      E.ξ .= pmap(mutation, E.ξ̂);
-      # after mutation, time is t ↦ t+1
-      rebin!(E, B, t+1);
-      f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
+      for t in 0:n_we_steps-1
+         # first selection is at t = 0
+         selection!(E, B, t);
+         copy!(E.ω, E.ω̂);
+         E.ξ .= pmap(mutation, E.ξ̂);
+         # after mutation, time is t ↦ t+1
+         rebin!(E, B, t+1);
+         Base.Cartesian.@nexprs $NO k -> observables_trajectory[k,t+1] = (observables[k]).(E.ξ) ⋅ E.ω;
+      end
+
+      return observables_trajectory
    end
-
-   return f_trajectory
 
 end
 
 """
-`prun_we_observable`: Run a parallel WE simulation, optionally returning the ensemble at
+`prun_we_observables`: Run a parallel WE simulation, optionally returning the ensemble at
 each step. This performs the mutation steps in parallel, and assumes a worker
 pool has already been created.
 
@@ -130,26 +132,27 @@ pool has already been created.
 * `selection!` - selection scheme
 * `analysis!` - perform any post mutation updates
 * `n_we_steps` - number of steps in the WE run
-* `f` - Observable function for the ergodic average
+* `observables` - Tuple of scalar observable functions for the ergodic average
 """
-function prun_we_observable(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int, f::FO) where
-   {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function, FO<:Function}
+function prun_we_observables(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+   {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function, NO}
 
-   E = deepcopy(E₀);
-   f_trajectory = zeros(n_we_steps);
+   quote
+      E = deepcopy(E₀);
+      observables_trajectory = zeros($NO, n_we_steps);
 
-   for t in 0:n_we_steps-1
-      # first selection is at t = 0
-      selection!(E, B, t);
-      copy!(E.ω, E.ω̂);
-      E.ξ .= pmap(mutation, E.ξ̂);
-      # after mutation, time is t ↦ t+1
-      analysis!(E, t+1);
-      f_trajectory[t+1] = f.(E.ξ) ⋅ E.ω;
+      for t in 0:n_we_steps-1
+         # first selection is at t = 0
+         selection!(E, B, t);
+         copy!(E.ω, E.ω̂);
+         E.ξ .= pmap(mutation, E.ξ̂);
+         # after mutation, time is t ↦ t+1
+         analysis!(E, t+1);
+         Base.Cartesian.@nexprs $NO k -> observables_trajectory[k,t+1] = (observables[k]).(E.ξ) ⋅ E.ω;
+      end
+
+      return observables_trajectory
    end
-
-   return f_trajectory
-
 end
 
 """

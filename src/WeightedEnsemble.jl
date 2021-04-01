@@ -28,14 +28,12 @@ include("utils.jl")
 export setup_Voronoi_bins
 # Load WE methods
 include("we_serial.jl")
-export run_we, run_we!, run_we_observable
+export run_we, run_we!, run_we_observables
 include("we_parallel.jl")
-export prun_we, prun_we!, prun_we_observable
+export prun_we, prun_we!, prun_we_observables
 include("we_threads.jl")
-export trun_we, trun_we!, trun_we_observable
+export trun_we, trun_we!, trun_we_observables
 
 export EnsembleWithBins, Bins, EnsembleWithoutBins
-
-
 
 end # end module
