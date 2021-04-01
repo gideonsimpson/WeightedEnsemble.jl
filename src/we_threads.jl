@@ -108,7 +108,7 @@ specified fucntions, `observables`, along the trajecotry.
 * `n_we_steps` - number of steps in the WE run
 * `observables` - Tuple of scalar observable functions for the ergodic average
 """
-function trun_we_observables(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+@generated function trun_we_observables(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, NO}
    
     quote
@@ -149,7 +149,7 @@ values a specified fucntion, `f`, along the trajecotry.
 * `n_we_steps` - number of steps in the WE run
 * `observables` - Tuple of scalar observable functions for the ergodic average
 """
-function trun_we_observables(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+@generated function trun_we_observables(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function, NO}
 
     quote

@@ -98,7 +98,7 @@ pool has already been created.
 * `n_we_steps` - number of steps in the WE run
 * `observables` - Tuple of scalar observable functions for the ergodic average
 """
-function prun_we_observables(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+@generated function prun_we_observables(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, NO}
 
    quote
@@ -118,7 +118,6 @@ function prun_we_observables(E₀::TE, B₀::TB, mutation::FM, selection!::FS, r
 
       return observables_trajectory
    end
-
 end
 
 """
@@ -134,7 +133,7 @@ pool has already been created.
 * `n_we_steps` - number of steps in the WE run
 * `observables` - Tuple of scalar observable functions for the ergodic average
 """
-function prun_we_observables(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+@generated function prun_we_observables(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function, NO}
 
    quote
