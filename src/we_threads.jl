@@ -38,8 +38,8 @@ function trun_we(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, 
         rebin!(E, B, t+1);
 
         if(mod(t+1, n_save_iters)==0)         
-            push!(E_vals, deepcopy(E))
-            push!(B_vals, deepcopy(B))
+            push!(E_trajectory, deepcopy(E))
+            push!(B_trajectory, deepcopy(B))
         end
 
     end
@@ -81,7 +81,7 @@ function trun_we(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_st
         analysis!(E, t+1);
 
         if(mod(t+1, n_save_iters)==0)         
-            push!(E_vals, deepcopy(E))
+            push!(E_trajectory, deepcopy(E))
         end
 
     end
