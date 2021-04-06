@@ -11,20 +11,16 @@ ensemble at each, step with
 * `selection!` - selection scheme
 * `rebin!` - rebin and update particles and bins
 * `n_we_steps` - number of steps in the WE run
-* `save_trajectory=true` - save the ensemble and bins at each iteration.  if false, only returns the final state
+### Optional Arguments
+* `n_save_iters = 1` - save the ensemble and bins every `n_save_iters` iterations.  Set `n_save_iters=n_we_steps` to only save the final values.
 """
-function trun_we(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, save_trajectory=true) where
+function trun_we(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int; n_save_iters = 1) where
    {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function}
 
     E = deepcopy(E₀);
     B = deepcopy(B₀);
     E_trajectory = TE[];
     B_trajectory = TB[];
-
-    if(save_trajectory)
-        push!(E_trajectory, deepcopy(E))
-        push!(B_trajectory, deepcopy(B))
-    end
 
     n_particles = length(E);
    
@@ -40,10 +36,12 @@ function trun_we(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, 
       
         # after mutation, time is t ↦ t+1
         rebin!(E, B, t+1);
-        if(save_trajectory || t==n_we_steps-1)
-            push!(E_trajectory, deepcopy(E))
-            push!(B_trajectory, deepcopy(B))
+
+        if(mod(t+1, n_save_iters)==0)         
+            push!(E_vals, deepcopy(E))
+            push!(B_vals, deepcopy(B))
         end
+
     end
     
     return E_trajectory, B_trajectory
@@ -60,20 +58,16 @@ at each, step with
 * `selection!` - selection scheme
 * `analysis!` - perform any post mutation updates
 * `n_we_steps` - number of steps in the WE run
-* `save_trajectory=true` - save the ensemble and bins at each iteration.  if false, only returns the final state
+### Optional Arguments
+* `n_save_iters = 1` - save the ensemble and bins every `n_save_iters` iterations.  Set `n_save_iters=n_we_steps` to only save the final values.
 """
-function trun_we(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_steps::Int, save_trajectory=true) where
+function trun_we(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_steps::Int; n_save_iters = 1) where
    {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function}
 
-   E = deepcopy(E₀);
-   E_trajectory = TE[];
-
-   if(save_trajectory)
-      push!(E_trajectory, deepcopy(E))
-   end
-
+    E = deepcopy(E₀);
+    E_trajectory = TE[];
+    
     n_particles = length(E);
-
 
     for t in 0:n_we_steps-1
         # first selection is at t = 0
@@ -86,9 +80,10 @@ function trun_we(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_st
         # after mutation, time is t ↦ t+1
         analysis!(E, t+1);
 
-        if(save_trajectory || t==n_we_steps-1)
-            push!(E_trajectory, deepcopy(E))
+        if(mod(t+1, n_save_iters)==0)         
+            push!(E_vals, deepcopy(E))
         end
+
     end
 
    return E_trajectory
