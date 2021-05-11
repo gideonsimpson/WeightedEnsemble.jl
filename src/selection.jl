@@ -103,3 +103,27 @@ function uniform_selection!(E::TE, B::TB; resample=Systematic) where{TE<:Ensembl
    end
    E, B
 end
+
+
+"""
+`trivial_selection!`: Each parent has exactly one offspring
+
+### Arguments
+* `E` - particle ensemble
+"""
+function trivial_selection!(E::TE) where{TE<:EnsembleWithoutBins}
+   
+   @. E.o = 1;
+   @. E.ω̂ = E.ω;
+   copy!.(E.ξ̂, E.ξ);
+   E
+end
+
+function trivial_selection!(E::TE) where{TE<:EnsembleWithBins}
+   @. E.o = 1;
+   @. E.ω̂ = E.ω;
+   @. E.b̂ = E.b;
+   copy!.(E.ξ̂, E.ξ);
+
+   E
+end
