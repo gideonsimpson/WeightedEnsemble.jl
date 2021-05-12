@@ -91,26 +91,24 @@ pool has already been created.
 * `n_we_steps` - number of steps in the WE run
 * `observables` - Tuple of scalar observable functions for the ergodic average
 """
-@generated function prun_we_observables(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+function prun_we_observables(E₀::TE, B₀::TB, mutation::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, NO}
 
-   quote
-      E = deepcopy(E₀);
-      B = deepcopy(B₀);
-      observables_trajectory = zeros($NO, n_we_steps);
+   E = deepcopy(E₀);
+   B = deepcopy(B₀);
+   observables_trajectory = zeros(NO, n_we_steps);
 
-      for t in 0:n_we_steps-1
-         # first selection is at t = 0
-         selection!(E, B, t);
-         copy!(E.ω, E.ω̂);
-         E.ξ .= pmap(mutation, E.ξ̂);
-         # after mutation, time is t ↦ t+1
-         rebin!(E, B, t+1);
-         Base.Cartesian.@nexprs $NO k -> observables_trajectory[k,t+1] = (observables[k]).(E.ξ) ⋅ E.ω;
-      end
-
-      return observables_trajectory
+   for t in 0:n_we_steps-1
+      # first selection is at t = 0
+      selection!(E, B, t);
+      copy!(E.ω, E.ω̂);
+      E.ξ .= pmap(mutation, E.ξ̂);
+      # after mutation, time is t ↦ t+1
+      rebin!(E, B, t+1);
+      ntuple(k-> observables_trajectory[k,t+1] =(observables[k]).(E.ξ) ⋅ E.ω, NO)
    end
+
+   return observables_trajectory
 end
 
 """
@@ -129,22 +127,20 @@ pool has already been created.
 @generated function prun_we_observables(E₀::TE, mutation::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function, NO}
 
-   quote
-      E = deepcopy(E₀);
-      observables_trajectory = zeros($NO, n_we_steps);
+   E = deepcopy(E₀);
+   observables_trajectory = zeros(NO, n_we_steps);
 
-      for t in 0:n_we_steps-1
-         # first selection is at t = 0
-         selection!(E, B, t);
-         copy!(E.ω, E.ω̂);
-         E.ξ .= pmap(mutation, E.ξ̂);
-         # after mutation, time is t ↦ t+1
-         analysis!(E, t+1);
-         Base.Cartesian.@nexprs $NO k -> observables_trajectory[k,t+1] = (observables[k]).(E.ξ) ⋅ E.ω;
-      end
-
-      return observables_trajectory
+   for t in 0:n_we_steps-1
+      # first selection is at t = 0
+      selection!(E, B, t);
+      copy!(E.ω, E.ω̂);
+      E.ξ .= pmap(mutation, E.ξ̂);
+      # after mutation, time is t ↦ t+1
+      analysis!(E, t+1);
+      ntuple(k-> observables_trajectory[k,t+1] =(observables[k]).(E.ξ) ⋅ E.ω, NO)
    end
+
+   return observables_trajectory
 end
 
 """

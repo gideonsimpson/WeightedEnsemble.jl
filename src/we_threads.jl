@@ -103,31 +103,29 @@ specified fucntions, `observables`, along the trajecotry.
 * `n_we_steps` - number of steps in the WE run
 * `observables` - Tuple of scalar observable functions for the ergodic average
 """
-@generated function trun_we_observables(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+function trun_we_observables(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:EnsembleWithBins, TB<:AbstractBins, FM<:Function, FS<:Function, FR<:Function, NO}
    
-    quote
-        E = deepcopy(E₀);
-        B = deepcopy(B₀);
-        observables_trajectory = zeros($NO, n_we_steps);
+    E = deepcopy(E₀);
+    B = deepcopy(B₀);
+    observables_trajectory = zeros(NO, n_we_steps);
 
-        n_particles = length(E);
+    n_particles = length(E);
 
-        for t in 0:n_we_steps-1
-            # first selection is at t = 0
-            selection!(E, B, t);
-            copy!(E.ω, E.ω̂);
-            Threads.@threads for k in 1:n_particles
-                copy!(E.ξ[k],E.ξ̂[k]);
-                mutation!(E.ξ[k]);
-            end
-            # after mutation, time is t ↦ t+1
-            rebin!(E, B, t+1);
-            Base.Cartesian.@nexprs $NO k -> observables_trajectory[k,t+1] = (observables[k]).(E.ξ) ⋅ E.ω;
+    for t in 0:n_we_steps-1
+        # first selection is at t = 0
+        selection!(E, B, t);
+        copy!(E.ω, E.ω̂);
+        Threads.@threads for k in 1:n_particles
+            copy!(E.ξ[k],E.ξ̂[k]);
+            mutation!(E.ξ[k]);
         end
-
-        return observables_trajectory
+        # after mutation, time is t ↦ t+1
+        rebin!(E, B, t+1);
+        ntuple(k-> observables_trajectory[k,t+1] =(observables[k]).(E.ξ) ⋅ E.ω, NO)
     end
+
+    return observables_trajectory
 
 end
 
@@ -144,30 +142,28 @@ values a specified fucntion, `f`, along the trajecotry.
 * `n_we_steps` - number of steps in the WE run
 * `observables` - Tuple of scalar observable functions for the ergodic average
 """
-@generated function trun_we_observables(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
+function trun_we_observables(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_steps::Int, observables::Tuple{Vararg{<:Function,NO}}) where
    {TE<:AbstractEnsemble, FM<:Function, FS<:Function, FA<:Function, NO}
 
-    quote
-        E = deepcopy(E₀);
-        observables_trajectory = zeros($NO, n_we_steps);
+    E = deepcopy(E₀);
+    observables_trajectory = zeros(NO, n_we_steps);
 
-        n_particles = length(E);
+    n_particles = length(E);
 
-        for t in 0:n_we_steps-1
-            # first selection is at t = 0
-            selection!(E, B, t);
-            copy!(E.ω, E.ω̂);
-            Threads.@threads for k in 1:n_particles
-                copy!(E.ξ[k],E.ξ̂[k]);
-                mutation!(E.ξ[k]);
-            end
-            # after mutation, time is t ↦ t+1
-            analysis!(E, t+1);
-            Base.Cartesian.@nexprs $NO k -> observables_trajectory[k,t+1] = (observables[k]).(E.ξ) ⋅ E.ω;
+    for t in 0:n_we_steps-1
+        # first selection is at t = 0
+        selection!(E, B, t);
+        copy!(E.ω, E.ω̂);
+        Threads.@threads for k in 1:n_particles
+            copy!(E.ξ[k],E.ξ̂[k]);
+            mutation!(E.ξ[k]);
         end
-
-        return observables_trajectory
+        # after mutation, time is t ↦ t+1
+        analysis!(E, t+1);
+        ntuple(k-> observables_trajectory[k,t+1] =(observables[k]).(E.ξ) ⋅ E.ω, NO)
     end
+
+    return observables_trajectory
 
 end
 
