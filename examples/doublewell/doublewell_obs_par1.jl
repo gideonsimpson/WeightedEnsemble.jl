@@ -35,7 +35,7 @@ n_particles = 10^2;
     Xvals, _ = sample_trajectory(x, sampler, options=opts);
     return Xvals[end]
 end
-selection! = (E, B, t)-> WeightedEnsemble.uniform_selection!(E, B);
+selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
 
 f1 = x-> Float64(-0.1 < x[1] < 0.1); # define observables
 f2 = x-> Float64( x[1] > 1.1);

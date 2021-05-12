@@ -4,8 +4,8 @@ X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
 =#
 
 using Distributed
-# nw = 4; # number of workers
-# addprocs(nw);
+nw = 4; # number of workers
+addprocs(nw);
 
 using Statistics
 using HypothesisTests

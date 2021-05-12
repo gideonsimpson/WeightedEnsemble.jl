@@ -40,8 +40,8 @@ f̃ = f.(voronoi_pts);
 _,v²_vectors = WeightedEnsemble.build_coarse_vectors(n_we_steps,K̃,float.(f̃));
 v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
 # define selection function
-selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation_selection!(E, B, v², t)
-# selection! = (E, B, t)-> WeightedEnsemble.uniform_selection!(E, B);
+selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation!(E, B, v², t)
+# selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
 
 # set up ensemble
 E₀ = WeightedEnsemble.Dirac_to_EnsembleWithBins(x₀, n_particles);

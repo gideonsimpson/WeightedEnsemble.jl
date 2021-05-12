@@ -1,5 +1,5 @@
 """
-`targeted_allocation_selection!`: Targeted allocation of particles using a
+`targeted_allocation!`: Targeted allocation of particles using a
 specified function, `g`, such that the party allocation is proportional to `g ⋅
 ω` for each bin.
 
@@ -10,7 +10,7 @@ specified function, `g`, such that the party allocation is proportional to `g �
 * `t` - t-th seletion step
 * `resample` - resampling scheme
 """
-function targeted_allocation_selection!(E::TE, B::TB, g::F, t::Int; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins, F<:Function}
+function targeted_allocation!(E::TE, B::TB, g::F, t::Int; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -64,7 +64,7 @@ end
 
 
 """
-`optimal_allocation_selection!`: Optimally particles according to the bins,
+`optimal_allocation!`: Optimally particles according to the bins,
 using a value function to approximate mutation variance.
 
 ### Arguments
@@ -74,7 +74,7 @@ using a value function to approximate mutation variance.
 * `t` - t-th seletion step
 * `resample` - resampling scheme
 """
-function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins, F<:Function}
+function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -127,7 +127,7 @@ function optimal_allocation_selection!(E::TE, B::TB, v²::F, t::Int; resample=Sy
 end
 
 """
-`uniform_selection!`: Uniformly select particles, ensuring each bin with
+`uniform_allocation!`: Uniformly select particles, ensuring each bin with
 positive bin weight has at least one offspring.
 
 ### Arguments
@@ -135,7 +135,7 @@ positive bin weight has at least one offspring.
 * `B` - bin data structure
 * `resample` - resampling scheme
 """
-function uniform_selection!(E::TE, B::TB; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins}
+function uniform_allocation!(E::TE, B::TB; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins}
    n_particles = length(E);
    n_bins = length(B);
    # zero out offspring counts
@@ -171,12 +171,12 @@ end
 
 
 """
-`trivial_selection!`: Each parent has exactly one offspring
+`trivial_allocation!`: Each parent has exactly one offspring
 
 ### Arguments
 * `E` - particle ensemble
 """
-function trivial_selection!(E::TE) where{TE<:EnsembleWithoutBins}
+function trivial_allocation!(E::TE) where{TE<:EnsembleWithoutBins}
    
    @. E.o = 1;
    @. E.ω̂ = E.ω;
@@ -184,7 +184,7 @@ function trivial_selection!(E::TE) where{TE<:EnsembleWithoutBins}
    E
 end
 
-function trivial_selection!(E::TE) where{TE<:EnsembleWithBins}
+function trivial_allocation!(E::TE) where{TE<:EnsembleWithBins}
    @. E.o = 1;
    @. E.ω̂ = E.ω;
    @. E.b̂ = E.b;
