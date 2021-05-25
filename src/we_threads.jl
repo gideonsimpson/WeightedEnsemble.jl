@@ -30,7 +30,7 @@ function trun_we(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, 
         copy!(E.ω, E.ω̂);
 
         Threads.@threads for k in 1:n_particles
-            deepcopy!(E.ξ[k],E.ξ̂[k]);
+            E.ξ[k] = deepcopy(E.ξ̂[k]);
             mutation!(E.ξ[k]);
         end
       
@@ -74,7 +74,7 @@ function trun_we(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_st
         selection!(E, B, t);
         copy!(E.ω, E.ω̂);
         Threads.@threads for k in 1:n_particles
-            deepcopy!(E.ξ[k],E.ξ̂[k]);
+            E.ξ[k] = deepcopy(E.ξ̂[k]);
             mutation!(E.ξ[k]);
         end
         # after mutation, time is t ↦ t+1
@@ -117,7 +117,7 @@ function trun_we_observables(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, 
         selection!(E, B, t);
         copy!(E.ω, E.ω̂);
         Threads.@threads for k in 1:n_particles
-            deepcopy!(E.ξ[k],E.ξ̂[k]);
+            E.ξ[k] = deepcopy(E.ξ̂[k]);
             mutation!(E.ξ[k]);
         end
         # after mutation, time is t ↦ t+1
@@ -155,7 +155,7 @@ function trun_we_observables(E₀::TE, mutation!::FM, selection!::FS, analysis!:
         selection!(E, B, t);
         copy!(E.ω, E.ω̂);
         Threads.@threads for k in 1:n_particles
-            deepcopy!(E.ξ[k],E.ξ̂[k]);
+            E.ξ[k] = deepcopy(E.ξ̂[k]);
             mutation!(E.ξ[k]);
         end
         # after mutation, time is t ↦ t+1
@@ -189,7 +189,7 @@ function trun_we!(E::TE, B::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_
         selection!(E, B, t);
         copy!(E.ω, E.ω̂);
         Threads.@threads for k in 1:n_particles
-            deepcopy!(E.ξ[k],E.ξ̂[k]);
+            E.ξ[k] = deepcopy(E.ξ̂[k]);
             mutation!(E.ξ[k]);
         end
         # after mutation, time is t ↦ t+1
@@ -219,7 +219,7 @@ function trun_we!(E::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_step
         selection!(E, t);
         copy!(E.ω, E.ω̂);
         Threads.@threads for k in 1:n_particles
-            deepcopy!(E.ξ[k],E.ξ̂[k]);
+            E.ξ[k] = deepcopy(E.ξ̂[k]);
             mutation!(E.ξ[k]);
         end
         # after mutation, time is t ↦ t+1

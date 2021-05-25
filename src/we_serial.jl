@@ -25,7 +25,7 @@ function run_we(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, rebin!::FR, n
       # first selection is at t = 0
       selection!(E, B, t);
       copy!(E.ω, E.ω̂);
-      deepcopy!.(E.ξ, E.ξ̂);
+      @. E.ξ = deepcopy(E.ξ̂);
       mutation!.(E.ξ);
       # after mutation, time is t ↦ t+1
       rebin!(E, B, t+1);
@@ -63,7 +63,7 @@ function run_we(E₀::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_ste
       # first selection is at t = 0
       selection!(E, B, t);
       copy!(E.ω, E.ω̂);
-      deepcopy!.(E.ξ, E.ξ̂);
+      @. E.ξ = deepcopy(E.ξ̂);
       mutation!.(E.ξ);
       # after mutation, time is t ↦ t+1
       analysis!(E, t+1);
@@ -102,7 +102,7 @@ function run_we_observables(E₀::TE, B₀::TB, mutation!::FM, selection!::FS, r
       # first selection is at t = 0
       selection!(E, B, t);
       copy!(E.ω, E.ω̂);
-      deepcopy!.(E.ξ, E.ξ̂);
+      @. E.ξ = deepcopy(E.ξ̂);
       mutation!.(E.ξ);
       # after mutation, time is t ↦ t+1
       rebin!(E, B, t+1);
@@ -136,7 +136,7 @@ function run_we_observables(E₀::TE, mutation!::FM, selection!::FS, analysis!::
       # first selection is at t = 0
       selection!(E, B, t);
       copy!(E.ω, E.ω̂);
-      deepcopy!.(E.ξ, E.ξ̂);
+      @. E.ξ = deepcopy(E.ξ̂);
       mutation!.(E.ξ);
       # after mutation, time is t ↦ t+1
       analysis!(E, t+1);
@@ -166,7 +166,7 @@ function run_we!(E::TE, B::TB, mutation!::FM, selection!::FS, rebin!::FR, n_we_s
       # first selection is at t = 0
       selection!(E, B, t);
       copy!(E.ω, E.ω̂);
-      deepcopy!.(E.ξ, E.ξ̂);
+      @. E.ξ = deepcopy(E.ξ̂);
       mutation!.(E.ξ);
       # after mutation, time is t ↦ t+1
       rebin!(E, B, t+1);
@@ -192,7 +192,7 @@ function run_we!(E::TE, mutation!::FM, selection!::FS, analysis!::FA, n_we_steps
       # first selection is at t = 0
       selection!(E, t);
       copy!(E.ω, E.ω̂);
-      deepcopy!.(E.ξ, E.ξ̂);
+      @. E.ξ = deepcopy(E.ξ̂)
       mutation!.(E.ξ);
       # after mutation, time is t ↦ t+1
       analysis!(E, t+1);

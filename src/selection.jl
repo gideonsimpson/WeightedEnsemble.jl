@@ -53,7 +53,7 @@ function targeted_allocation!(E::TE, B::TB, g::F, t::Int; resample=Systematic) w
       # identify the bin of the current particle
       @inbounds bin = E.b[i];
       for k in 1:E.o[i]
-         @inbounds deepcopy!(E.ξ̂[k+n_spawned], E.ξ[i]);
+         @inbounds E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          @inbounds E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
          @inbounds E.b̂[k+n_spawned] = bin;
       end
@@ -117,7 +117,7 @@ function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) 
       # identify the bin of the current particle
       @inbounds bin = E.b[i];
       for k in 1:E.o[i]
-         @inbounds deepcopy!(E.ξ̂[k+n_spawned], E.ξ[i]);
+         @inbounds E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          @inbounds E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
          @inbounds E.b̂[k+n_spawned] = bin;
       end
@@ -160,7 +160,7 @@ function uniform_allocation!(E::TE, B::TB; resample=Systematic) where{TE<:Ensemb
       # identify the bin of the current particle
       @inbounds bin = E.b[i];
       for k in 1:E.o[i]
-         @inbounds deepcopy!(E.ξ̂[k+n_spawned], E.ξ[i]);
+         @inbounds E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          @inbounds E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
          @inbounds E.b̂[k+n_spawned] = bin;
       end
@@ -180,7 +180,7 @@ function trivial_allocation!(E::TE) where{TE<:EnsembleWithoutBins}
    
    @. E.o = 1;
    @. E.ω̂ = E.ω;
-   deepcopy!.(E.ξ̂, E.ξ);
+   @. E.ξ̂ = deepcopy(E.ξ);
    E
 end
 
@@ -188,7 +188,7 @@ function trivial_allocation!(E::TE) where{TE<:EnsembleWithBins}
    @. E.o = 1;
    @. E.ω̂ = E.ω;
    @. E.b̂ = E.b;
-   deepcopy!.(E.ξ̂, E.ξ);
+   @. E.ξ̂ = deepcopy(E.ξ);
 
    E
 end
