@@ -22,7 +22,9 @@ include("resampling.jl")
 # Load selection algorithms
 include("selection.jl")
 # Load coarse model algorithms
-include("coarse.jl")
+include("coarse_serial.jl")
+include("coarse_parallel.jl")
+include("coarse_threads.jl")
 # Load utility functions
 include("utils.jl")
 export setup_Voronoi_bins
