@@ -45,11 +45,11 @@ function tbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, 
 
    X = similar(x0_vals[1]);
    K = spzeros(n_bins, n_bins);
-   jvals = zeros(Int, n_samples);
 
    for l in 1:length(x0_vals)
       i = bin0_vals[l];
-      Threads.@threads for k in 1:n_samples
+      # Threads.@threads 
+      for k in 1:n_samples
          X .= deepcopy(x0_vals[l]);
          mutation!(X);
          jvals[k] = bin_id(X);
@@ -82,13 +82,13 @@ contructed.  Returns a sparse matrix.
 
 function pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
    n_x0 = length(x0_vals);
-   row_vals = SharedArray{Float64}(n_x0*n_samples);
-   col_vals = SharedArray{Float64}(n_x0*n_samples);
+   row_vals = SharedArray{Int}(n_x0*n_samples);
+   col_vals = SharedArray{Int}(n_x0*n_samples);
    X = similar(x0_vals[1]);
 
    @sync @distributed for k in 1:n_samples
       for l in 1:n_x0
-         X .= copy(x0_vals[l]);
+         X .= deepcopy(x0_vals[l]);
          row_vals[n_x0*(k-1) + l] = bin0_vals[l];
          mutation!(X);
          col_vals[n_x0*(k-1) + l] = bin_id(X);
