@@ -68,7 +68,7 @@ Langevin equation.
 * Multithreading is now implemented using `trun_we` type commands.
 
 # Caveats
-
+* There is currently something wrong with the parallel (distributed) coarse matrix assembly.  This needs to be fixed.  The serially or multithreaded versions work.
 * The mutation step in the provided examples make use of [`BasicMD`](https://github.com/gideonsimpson/BasicMD.jl)
 * One of the examples makes use of [`TestLandscapes`](https://github.com/gideonsimpson/TestLandscapes.jl)
 * The mutation step in the Schlögl example code makes use of [`DiffEqBiological`](https://github.com/SciML/DiffEqBiological.jl)
