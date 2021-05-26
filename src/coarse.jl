@@ -29,6 +29,42 @@ function build_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n
    return K
 end
 
+"""
+`tbuild_coarse_transition_matrix`: Contruct a transition matrix amongst the bins
+(multithreaded version).
+
+### Arguments
+* `mutation!` - an in place mutation function
+* `bin_id` - bin identification function
+* `x0_vals` - an array of starting values
+* `bin0_vals` - an array of the bins corresponding to `x0_vals`
+* `n_bins` - total number of bins
+* `n_samples` - number of trials for each sample
+"""
+function tbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
+
+   X = similar(x0_vals[1]);
+   K = spzeros(n_bins, n_bins);
+   jvals = zeros(Int, n_samples);
+
+   for l in 1:length(x0_vals)
+      i = bin0_vals[l];
+      Threads.@threads for k in 1:n_samples
+         X .= deepcopy(x0_vals[l]);
+         mutation!(X);
+         jvals[k] = bin_id(X);
+      end
+      
+      for j in jvals
+         K[i,j] +=1.0;
+      end
+   end
+
+   @. K = K/n_samples;
+
+   return K
+end
+
 
 """
 `pbuild_coarse_transition_matrix`: Contruct a transition matrix amongst the
