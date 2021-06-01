@@ -43,9 +43,8 @@ end
 
 Random.seed!(100);
 x0_vals = copy(voronoi_pts);
-bin0_vals = bin_id.(voronoi_pts);
 n_bins = length(B₀);
-K̃ = WeightedEnsemble.pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals,bin0_vals, n_bins, n_samples_per_bin);
+K̃ = WeightedEnsemble.pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, n_bins, n_samples_per_bin);
 
 # define coarse observable as a bin function
 f̃ = f.(voronoi_pts);
