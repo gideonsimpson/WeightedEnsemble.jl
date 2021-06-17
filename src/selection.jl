@@ -10,7 +10,7 @@ specified function, `g`, such that the party allocation is proportional to `g �
 * `t` - t-th seletion step
 * `resample` - resampling scheme
 """
-function targeted_allocation!(E::TE, B::TB, g::F, t::Int; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins, F<:Function}
+function targeted_allocation!(E::TE, B::TB, g::F, t::Int; resample=Systematic) where{TE<:Ensemble, TB<:Bins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -56,6 +56,7 @@ function targeted_allocation!(E::TE, B::TB, g::F, t::Int; resample=Systematic) w
          @inbounds E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          @inbounds E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
          @inbounds E.b̂[k+n_spawned] = bin;
+         @inbounds E.d̂[k+n_spawned] = deepcopy(E.d[i]);
       end
       @inbounds n_spawned += E.o[i];
    end
@@ -74,7 +75,7 @@ using a value function to approximate mutation variance.
 * `t` - t-th seletion step
 * `resample` - resampling scheme
 """
-function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins, F<:Function}
+function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) where{TE<:Ensemble, TB<:Bins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -120,6 +121,7 @@ function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) 
          @inbounds E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          @inbounds E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
          @inbounds E.b̂[k+n_spawned] = bin;
+         @inbounds E.d̂[k+n_spawned] = deepcopy(E.d[i]);         
       end
       @inbounds n_spawned += E.o[i];
    end
@@ -135,7 +137,7 @@ positive bin weight has at least one offspring.
 * `B` - bin data structure
 * `resample` - resampling scheme
 """
-function uniform_allocation!(E::TE, B::TB; resample=Systematic) where{TE<:EnsembleWithBins, TB<:AbstractBins}
+function uniform_allocation!(E::TE, B::TB; resample=Systematic) where{TE<:Ensemble, TB<:Bins}
    n_particles = length(E);
    n_bins = length(B);
    # zero out offspring counts
@@ -163,32 +165,19 @@ function uniform_allocation!(E::TE, B::TB; resample=Systematic) where{TE<:Ensemb
          @inbounds E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
          @inbounds E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
          @inbounds E.b̂[k+n_spawned] = bin;
+         @inbounds E.d̂[k+n_spawned] = deepcopy(E.d[i]);
       end
       @inbounds n_spawned += E.o[i];
    end
    E, B
 end
 
-
-"""
-`trivial_allocation!`: Each parent has exactly one offspring
-
-### Arguments
-* `E` - particle ensemble
-"""
-function trivial_allocation!(E::TE) where{TE<:EnsembleWithoutBins}
-   
-   @. E.o = 1;
-   @. E.ω̂ = E.ω;
-   @. E.ξ̂ = deepcopy(E.ξ);
-   E
-end
-
-function trivial_allocation!(E::TE) where{TE<:EnsembleWithBins}
+function trivial_allocation!(E::TE) where{TE<:Ensemble}
    @. E.o = 1;
    @. E.ω̂ = E.ω;
    @. E.b̂ = E.b;
    @. E.ξ̂ = deepcopy(E.ξ);
+   @. E.d̂ = deepcopy(E.d);
 
    E
 end

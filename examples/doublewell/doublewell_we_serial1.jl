@@ -42,14 +42,17 @@ v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
 selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation!(E, B, v², t)
 # selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
 
+# set up sampler
+we_sampler = WEsampler(mutation!, selection!, rebin!);
+
 # set up ensemble
-E₀ = WeightedEnsemble.Dirac_to_EnsembleWithBins(x₀, n_particles);
+E₀ = Dirac_to_Ensemble(x₀, n_particles);
 rebin!(E₀, B₀, 0);
 
 # run
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-run_we!(E, B, mutation!, selection!, rebin!, n_we_steps);
+run_we!(E, B, we_sampler, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)

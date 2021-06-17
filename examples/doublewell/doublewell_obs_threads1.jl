@@ -23,6 +23,7 @@ opts = MDOptions(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
 mutation! = x-> sample_trajectory!(x, sampler, options=opts);
 
 selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
+we_sampler = WEsampler(mutation!, selection!, rebin!);
 
 f = x-> Float64(-0.1 < x[1] < 0.1); # define observable
 f1 = x-> Float64(-0.1 < x[1] < 0.1); # define observables
@@ -30,8 +31,8 @@ f2 = x-> Float64( x[1] > 1.1);
 obs = (f1, f2);
 
 # set up ensemble
-E₀ = WeightedEnsemble.Dirac_to_EnsembleWithBins(x₀, n_particles);
+E₀ = Dirac_to_Ensemble(x₀, n_particles);
 rebin!(E₀, B₀, 0);
 
 Random.seed!(200)
-f_trajectory = WeightedEnsemble.trun_we_observables(E₀, B₀, mutation!, selection!, rebin!, n_we_steps, (f,));
+f_trajectory = WeightedEnsemble.trun_we_observables(E₀, B₀, we_sampler, n_we_steps, (f,));
