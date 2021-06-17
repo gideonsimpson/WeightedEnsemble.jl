@@ -9,7 +9,6 @@
 """
 function update_bin_weights!(B::TB, E::TE) where {TB<:Bins, TE<:Ensemble}
 
-   n_particles = length(E);
    n_bins = length(B);
 
    # this loops over bins
