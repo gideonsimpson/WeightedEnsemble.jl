@@ -4,7 +4,6 @@ X(T) ∈ B for the Muller potential.
 =#
 
 using Statistics
-using HypothesisTests
 using Printf
 
 include("muller_setup.jl");

@@ -47,9 +47,9 @@ K̃ = WeightedEnsemble.pbuild_coarse_transition_matrix(mutation!, bin_id, x0_val
 f̃ = f.(voronoi_pts);
 _,v²_vectors = WeightedEnsemble.build_coarse_vectors(n_we_steps,K̃,float.(f̃));
 v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
-# selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation!(E, B, v², t)
+selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation!(E, B, v², t)
 
-selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
+# selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
 we_sampler = DistributedWEsampler(mutation, selection!, rebin!);
 
 # set up ensemble

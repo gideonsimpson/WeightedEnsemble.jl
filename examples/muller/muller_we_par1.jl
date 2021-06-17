@@ -5,10 +5,9 @@ satisfying X(T) ∈ B for the Muller potential.
 
 using Distributed
 using Statistics
-using HypothesisTests
 using Printf
 
-# addprocs(4);
+addprocs(4);
 
 @everywhere include("muller_setup.jl");
 @everywhere using WeightedEnsemble
@@ -52,15 +51,16 @@ _,v²_vectors = WeightedEnsemble.build_coarse_vectors(n_we_steps,K̃,float.(f̃)
 v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
 selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation!(E, B, v², t)
 
+we_sampler = DistributedWEsampler(mutation, selection!, rebin!);
 
 # set up ensemble
-E₀ = WeightedEnsemble.Dirac_to_EnsembleWithBins(x₀, n_particles);
+E₀ = Dirac_to_Ensemble(x₀, n_particles);
 rebin!(E₀, B₀, 0);
 
 # run
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-prun_we!(E, B, mutation,selection!, rebin!, n_we_steps);
+prun_we!(E, B, we_sampler, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)
