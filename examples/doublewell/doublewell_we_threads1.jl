@@ -3,9 +3,7 @@ WE estimation of the probability of for a diffusion with X(0) = a satisfying
 X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
 =#
 
-using Revise
 using Statistics
-using HypothesisTests
 using Printf
 using WeightedEnsemble
 

@@ -5,7 +5,6 @@ X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
 
 
 using Statistics
-using HypothesisTests
 using Printf
 using WeightedEnsemble
 
@@ -42,8 +41,18 @@ v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
 selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation!(E, B, v², t)
 # selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
 
-# set up sampler
-we_sampler = WEsampler(mutation!, selection!, rebin!);
+# set up sampler - trivial analysis step
+# we_sampler = WEsampler(mutation!, selection!, rebin!);
+
+# more elaborate analysis step
+f_est_avg = zeros(1);
+function analysis!(E, B, t)
+    f_est = E.ω ⋅ f.(E.ξ);
+    f_est_avg[1] += f_est;
+    @printf("t = %g: estimate = %g, running avg = %g\n", t, f_est, f_est_avg[1]/t)
+    E, B
+end
+we_sampler = WEsampler(mutation!, selection!, rebin!, analysis!);
 
 # set up ensemble
 E₀ = Dirac_to_Ensemble(x₀, n_particles);

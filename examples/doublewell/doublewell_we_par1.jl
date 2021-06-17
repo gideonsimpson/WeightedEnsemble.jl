@@ -7,7 +7,6 @@ Either run as julia -p 4 doublewell_we_par1.jl or uncomment addprocs below.
 
 using Distributed
 using Statistics
-using HypothesisTests
 using Printf
 
 nw = 4; # number of workers
