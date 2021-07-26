@@ -9,6 +9,7 @@ using SharedArrays
 using StatsBase
 using Distributions
 using Arpack
+using IterativeSolvers
 
 # Load types
 include("types.jl")

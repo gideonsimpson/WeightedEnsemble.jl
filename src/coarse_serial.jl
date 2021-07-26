@@ -89,7 +89,7 @@ function build_coarse_poisson(K̃, f̃)
    μ̃ = real.(evecs[:,1]);μ̃ .= μ̃/ sum(μ̃); #normalize the invariant measure
 
    # compute solution to Poisson
-   h̃ = (I - K̃)\(f̃ .- μ̃ ⋅ f̃); 
+   h̃ = gmres(I - K̃, f̃ .- μ̃ ⋅ f̃); 
    # normalize
    h̃ = h̃ .- μ̃⋅h̃;
    K̃h̃ = K̃*h̃;
