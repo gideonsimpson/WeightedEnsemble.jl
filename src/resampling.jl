@@ -53,3 +53,18 @@ function Systematic(n,ω)
 
     return Nvals
 end
+
+"""
+`WEMultinomial`: perform multinomial sampling
+
+### Arguments
+`n` - number of trials
+`ω` - probabilities
+"""
+function WEMultinomial(n, ω)
+
+    multinomial = Multinomial(n, ω);
+    Nvals = rand(multinomial);
+
+    return Nvals
+end

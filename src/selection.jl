@@ -8,9 +8,11 @@ specified function, `g`, such that the party allocation is proportional to `g �
 * `B` - bin data structure
 * `g` - target function
 * `t` - t-th seletion step
-* `resample` - resampling scheme
+### Optional Arguments
+* `allocation_resampler=Systematic` - resampling scheme amongst bins
+* `within_bin_resampler=WEMultinomial` - resampling scheme within bins
 """
-function targeted_allocation!(E::TE, B::TB, g::F, t::Int; resample=Systematic) where{TE<:Ensemble, TB<:Bins, F<:Function}
+function targeted_allocation!(E::TE, B::TB, g::F, t::Int; allocation_resampler=Systematic, within_bin_resampler=WEMultinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -32,13 +34,13 @@ function targeted_allocation!(E::TE, B::TB, g::F, t::Int; resample=Systematic) w
    if(sum(Ñ)>0)
       # compute probabilities
       ρ .= Ñ/sum(Ñ);
-      B.target .= (B.n .>0) .+ resample(n_particles-R, ρ);
+      B.target .= (B.n .>0) .+ allocation_resampler(n_particles-R, ρ);
 
       # compute number of offspring of each particle bin by bin
       for p in non_empty_bins
          # get particle indices for bin p
          particle_ids = findall(isequal(p), E.b);
-         @inbounds E.o[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
+         @inbounds E.o[particle_ids] .= within_bin_resampler(B.target[p], E.ω[particle_ids]/B.ν[p]);
       end
 
    else
@@ -73,9 +75,11 @@ using a value function to approximate mutation variance.
 * `B` - bin data structure
 * `v²` - v² variance function estimator
 * `t` - t-th seletion step
-* `resample` - resampling scheme
+### Optional Arguments
+* `allocation_resampler=Systematic` - resampling scheme amongst bins
+* `within_bin_resampler=WEMultinomial` - resampling scheme within bins
 """
-function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) where{TE<:Ensemble, TB<:Bins, F<:Function}
+function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; allocation_resampler=Systematic, within_bin_resampler=WEMultinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -97,13 +101,13 @@ function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; resample=Systematic) 
    if(sum(Ñ)>0)
       # compute probabilities
       ρ .= Ñ/sum(Ñ);
-      B.target .= (B.n .>0) .+ resample(n_particles-R, ρ);
+      B.target .= (B.n .>0) .+ allocation_resampler(n_particles-R, ρ);
 
       # compute number of offspring of each particle bin by bin
       for p in non_empty_bins
          # get particle indices for bin p
          particle_ids = findall(isequal(p), E.b);
-         @inbounds E.o[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
+         @inbounds E.o[particle_ids] .= within_bin_resampler(B.target[p], E.ω[particle_ids]/B.ν[p]);
       end
 
    else
@@ -135,9 +139,11 @@ positive bin weight has at least one offspring.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
-* `resample` - resampling scheme
+### Optional Arguments
+* `allocation_resampler=Systematic` - resampling scheme amongst bins
+* `within_bin_resampler=WEMultinomial` - resampling scheme within bins
 """
-function uniform_allocation!(E::TE, B::TB; resample=Systematic) where{TE<:Ensemble, TB<:Bins}
+function uniform_allocation!(E::TE, B::TB; allocation_resampler=Systematic, within_bin_resampler=WEMultinomial) where{TE<:Ensemble, TB<:Bins}
    n_particles = length(E);
    n_bins = length(B);
    # zero out offspring counts
@@ -147,13 +153,13 @@ function uniform_allocation!(E::TE, B::TB; resample=Systematic) where{TE<:Ensemb
    # ensure each bin with walkers has at least one offspring
    non_empty_bins = findall(n->n>0, B.n);
    R = length(non_empty_bins);
-   @inbounds B.target[non_empty_bins] .= 1 .+ resample(n_particles-R, [1.0/R for j in 1:R]);
+   @inbounds B.target[non_empty_bins] .= 1 .+ allocation_resampler(n_particles-R, [1.0/R for j in 1:R]);
 
    # compute number of offspring of each particle bin by bin
    for p in non_empty_bins
       # get particle indices for bin p
       particle_ids = findall(isequal(p), E.b);
-      @inbounds E.o[particle_ids] .= resample(B.target[p], E.ω[particle_ids]/B.ν[p]);
+      @inbounds E.o[particle_ids] .= within_bin_resampler(B.target[p], E.ω[particle_ids]/B.ν[p]);
    end
 
    # resample the particles
