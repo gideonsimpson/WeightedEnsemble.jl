@@ -24,13 +24,13 @@ function Residual(n,ω)
 end
 
 """
-`Stratified`: perform stratified sampling
+`stratified`: perform stratified sampling
 
 ### Arguments
 `n` - number of trials
 `ω` - probabilities
 """
-function Stratified(n,ω)
+function stratified(n,ω)
     U = range(0,stop=n-1)/n .+ rand(n)/n;
 
     Nvals = counts(quantile.(Categorical(ω), U), 1:length(ω));
@@ -39,13 +39,13 @@ function Stratified(n,ω)
 end
 
 """
-`Systematic`: perform systematic sampling
+`systematic`: perform systematic sampling
 
 ### Arguments
 `n` - number of trials
 `ω` - probabilities
 """
-function Systematic(n,ω)
+function systematic(n,ω)
 
     U = range(0,stop=n-1)/n .+ rand()/n;
 
@@ -55,13 +55,13 @@ function Systematic(n,ω)
 end
 
 """
-`WEMultinomial`: perform multinomial sampling
+`multinomial`: perform multinomial sampling
 
 ### Arguments
 `n` - number of trials
 `ω` - probabilities
 """
-function WEMultinomial(n, ω)
+function multinomial(n, ω)
 
     multinomial = Multinomial(n, ω);
     Nvals = rand(multinomial);
