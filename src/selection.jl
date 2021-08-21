@@ -1,18 +1,18 @@
 """
 `targeted_allocation!`: Targeted allocation of particles using a
-specified function, `g`, such that the party allocation is proportional to `g ⋅
-ω` for each bin.
+specified function, `g`, that takes as its arguments the bin index, `p`, the
+ensemble `E`, and the iteration, `t`
 
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
 * `g` - target function
 * `t` - t-th seletion step
-### Optional Arguments
-* `allocation_resampler=Systematic` - resampling scheme amongst bins
-* `within_bin_resampler=WEMultinomial` - resampling scheme within bins
+  ### Optional Arguments
+* `allocation_resampler=systematic` - resampling scheme amongst bins
+* `within_bin_resampler=multinomial` - resampling scheme within bins
 """
-function targeted_allocation!(E::TE, B::TB, g::F, t::Int; allocation_resampler=Systematic, within_bin_resampler=WEMultinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
+function targeted_allocation!(E::TE, B::TB, g::F, t::Int; allocation_resampler=systematic, within_bin_resampler=multinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -27,8 +27,7 @@ function targeted_allocation!(E::TE, B::TB, g::F, t::Int; allocation_resampler=S
    ρ = zeros(n_bins);
 
    for p in non_empty_bins
-      particle_ids = findall(isequal(p), E.b);
-      @inbounds Ñ[p] = E.ω[particle_ids] ⋅ g.(E.ξ[particle_ids],t);
+      Ñ[p] = g(p, E, t);
    end
 
    if(sum(Ñ)>0)
@@ -76,10 +75,10 @@ using a value function to approximate mutation variance.
 * `v²` - v² variance function estimator
 * `t` - t-th seletion step
 ### Optional Arguments
-* `allocation_resampler=Systematic` - resampling scheme amongst bins
-* `within_bin_resampler=WEMultinomial` - resampling scheme within bins
+* `allocation_resampler=systematic` - resampling scheme amongst bins
+* `within_bin_resampler=multinomial` - resampling scheme within bins
 """
-function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; allocation_resampler=Systematic, within_bin_resampler=WEMultinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
+function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; allocation_resampler=systematic, within_bin_resampler=multinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -140,10 +139,10 @@ positive bin weight has at least one offspring.
 * `E` - particle ensemble
 * `B` - bin data structure
 ### Optional Arguments
-* `allocation_resampler=Systematic` - resampling scheme amongst bins
-* `within_bin_resampler=WEMultinomial` - resampling scheme within bins
+* `allocation_resampler=systematic` - resampling scheme amongst bins
+* `within_bin_resampler=multinomial` - resampling scheme within bins
 """
-function uniform_allocation!(E::TE, B::TB; allocation_resampler=Systematic, within_bin_resampler=WEMultinomial) where{TE<:Ensemble, TB<:Bins}
+function uniform_allocation!(E::TE, B::TB; allocation_resampler=systematic, within_bin_resampler=multinomial) where{TE<:Ensemble, TB<:Bins}
    n_particles = length(E);
    n_bins = length(B);
    # zero out offspring counts
