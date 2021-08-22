@@ -1,18 +1,18 @@
 """
-`targeted_allocation!`: Targeted allocation of particles using a
-specified function, `g`, that takes as its arguments the bin index, `p`, the
-ensemble `E`, and the iteration, `t`
+`targeted_allocation!`: Targeted allocation of particles using a specified
+function, `G:(p, E, B, t) → [0,∞)` for bin `p`.  Empty bins are allocated zero
+children and nonempty bins are allocated ≥ 1 child.
 
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
-* `g` - target function
+* `G` - target function
 * `t` - t-th seletion step
   ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 * `within_bin_resampler=multinomial` - resampling scheme within bins
 """
-function targeted_allocation!(E::TE, B::TB, g::F, t::Int; allocation_resampler=systematic, within_bin_resampler=multinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
+function targeted_allocation!(E::TE, B::TB, G::F, t::Int; allocation_resampler=systematic, within_bin_resampler=multinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
 
    n_particles = length(E);
    n_bins = length(B);
@@ -22,18 +22,18 @@ function targeted_allocation!(E::TE, B::TB, g::F, t::Int; allocation_resampler=s
 
    # identify nonempty bins
    non_empty_bins = findall(n->n>0, B.n);
-   R = length(non_empty_bins);
+   n_occupied = length(non_empty_bins);
    Ñ = zeros(n_bins);
    ρ = zeros(n_bins);
 
    for p in non_empty_bins
-      Ñ[p] = g(p, E, t);
+      Ñ[p] = G(p, E, B, t);
    end
 
    if(sum(Ñ)>0)
       # compute probabilities
       ρ .= Ñ/sum(Ñ);
-      B.target .= (B.n .>0) .+ allocation_resampler(n_particles-R, ρ);
+      B.target .= (B.n .>0) .+ allocation_resampler(n_particles-n_occupied, ρ);
 
       # compute number of offspring of each particle bin by bin
       for p in non_empty_bins
@@ -80,54 +80,14 @@ using a value function to approximate mutation variance.
 """
 function optimal_allocation!(E::TE, B::TB, v²::F, t::Int; allocation_resampler=systematic, within_bin_resampler=multinomial) where{TE<:Ensemble, TB<:Bins, F<:Function}
 
-   n_particles = length(E);
-   n_bins = length(B);
-   # zero out offspring counts
-   @. E.o = 0;
-   @. B.target = 0;
-
-   # identify nonempty bins
-   non_empty_bins = findall(n->n>0, B.n);
-   R = length(non_empty_bins);
-   Ñ = zeros(n_bins);
-   ρ = zeros(n_bins);
-
-   for p in non_empty_bins
+   function G(p, E, B, t)
       particle_ids = findall(isequal(p), E.b);
-      @inbounds Ñ[p] = sqrt(B.ν[p] * (E.ω[particle_ids] ⋅ v².(E.ξ[particle_ids],t)));
+      bin_target = sqrt(B.ν[p] * (E.ω[particle_ids] ⋅ v².(E.ξ[particle_ids],t)));
+      return bin_target
    end
 
-   if(sum(Ñ)>0)
-      # compute probabilities
-      ρ .= Ñ/sum(Ñ);
-      B.target .= (B.n .>0) .+ allocation_resampler(n_particles-R, ρ);
-
-      # compute number of offspring of each particle bin by bin
-      for p in non_empty_bins
-         # get particle indices for bin p
-         particle_ids = findall(isequal(p), E.b);
-         @inbounds E.o[particle_ids] .= within_bin_resampler(B.target[p], E.ω[particle_ids]/B.ν[p]);
-      end
-
-   else
-      # every particle copies itself
-      @. B.target = B.n;
-      @. E.o = 1;
-   end
-
-   # resample the particles
-   n_spawned = 0;
-   for i in 1:n_particles
-      # identify the bin of the current particle
-      @inbounds bin = E.b[i];
-      for k in 1:E.o[i]
-         @inbounds E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
-         @inbounds E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
-         @inbounds E.b̂[k+n_spawned] = bin;
-         @inbounds E.d̂[k+n_spawned] = deepcopy(E.d[i]);         
-      end
-      @inbounds n_spawned += E.o[i];
-   end
+   targeted_allocation!(E, B, G, t, allocation_resampler=allocation_resampler, within_bin_resampler=within_bin_resampler);
+   
    E, B
 end
 
@@ -143,39 +103,11 @@ positive bin weight has at least one offspring.
 * `within_bin_resampler=multinomial` - resampling scheme within bins
 """
 function uniform_allocation!(E::TE, B::TB; allocation_resampler=systematic, within_bin_resampler=multinomial) where{TE<:Ensemble, TB<:Bins}
-   n_particles = length(E);
-   n_bins = length(B);
-   # zero out offspring counts
-   @. E.o = 0;
-   @. B.target = 0;
-
-   # ensure each bin with walkers has at least one offspring
-   non_empty_bins = findall(n->n>0, B.n);
-   R = length(non_empty_bins);
-   @inbounds B.target[non_empty_bins] .= 1 .+ allocation_resampler(n_particles-R, [1.0/R for j in 1:R]);
-
-   # compute number of offspring of each particle bin by bin
-   for p in non_empty_bins
-      # get particle indices for bin p
-      particle_ids = findall(isequal(p), E.b);
-      @inbounds E.o[particle_ids] .= within_bin_resampler(B.target[p], E.ω[particle_ids]/B.ν[p]);
-   end
-
-   # resample the particles
-   n_spawned = 0;
-   for i in 1:n_particles
-      # identify the bin of the current particle
-      @inbounds bin = E.b[i];
-      for k in 1:E.o[i]
-         @inbounds E.ξ̂[k+n_spawned] = deepcopy(E.ξ[i]);
-         @inbounds E.ω̂[k+n_spawned] = B.ν[bin]/B.target[bin];
-         @inbounds E.b̂[k+n_spawned] = bin;
-         @inbounds E.d̂[k+n_spawned] = deepcopy(E.d[i]);
-      end
-      @inbounds n_spawned += E.o[i];
-   end
+   G = (p, E, B, t)-> 1.;
+   targeted_allocation!(E, B, G, 0, allocation_resampler=allocation_resampler, within_bin_resampler=within_bin_resampler);
    E, B
 end
+
 
 function trivial_allocation!(E::TE) where{TE<:Ensemble}
    @. E.o = 1;
