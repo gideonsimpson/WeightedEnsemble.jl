@@ -21,7 +21,7 @@ include("resampling.jl")
 # Load allocation algorithms
 include("allocation.jl")
 export minimal_bin_allocation!, targeted_allocation!,
-    optimal_allocation!, uniform_allocation!
+    optimal_allocation!, uniform_allocation!, offspring_allocation!
 # Load selection algorithms
 include("selection.jl")
 export trivial_selection!, uniform_selection!,

@@ -22,19 +22,9 @@ the particles over.
 * `E` - particle ensemble
 * `B` - bin data structure
 ### Optional Arguments
-* `within_bin_resampler=multinomial` - resampling scheme within bins
 """
-function repopulate!(E::TE, B::TB; within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins}
+function repopulate!(E::TE, B::TB) where {TE<:Ensemble,TB<:Bins}
     n_particles = length(E)
-    non_empty_bins = findall(n -> n > 0, B.n)
-
-    # compute number of offspring of each particle bin by bin
-    for p in non_empty_bins
-        # get particle indices for bin p
-        particle_ids = findall(isequal(p), E.b)
-        @inbounds E.o[particle_ids] .+= within_bin_resampler(B.target[p], E.ω[particle_ids] / B.ν[p])
-    end
-
     n_spawned = 0
     # copy over the particles
     for i = 1:n_particles
@@ -64,20 +54,22 @@ positive bin weight has at least one offspring.
 """
 function uniform_selection!(E::TE, B::TB; allocation_resampler = systematic, within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins}
 
-   # zero out offspring counts
-   @. E.o = 0
-   @. B.target = 0
-   # ensure each nonempty bin has at least one particle
-   minimal_bin_allocation!(B)
-   n_particles = length(E)
-   # number of remaining particles to allocate
-   n_allocate = n_particles - sum(B.target)
-   # allocate remaining particles
-   uniform_allocation!(B, E, n_allocate, allocation_resampler = allocation_resampler)
-   # populate the particles
-   repopulate!(E, B, within_bin_resampler = within_bin_resampler)
+    # zero out offspring counts
+    @. E.o = 0
+    @. B.target = 0
+    # ensure each nonempty bin has at least one particle
+    minimal_bin_allocation!(B)
+    n_particles = length(E)
+    # number of remaining particles to allocate
+    n_allocate = n_particles - sum(B.target)
+    # allocate remaining particles
+    uniform_allocation!(B, E, n_allocate, allocation_resampler = allocation_resampler)
+    # set number of offspring of each particle
+    offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler)
+    # populate the particles
+    repopulate!(E, B)
 
-   E, B
+    E, B
 end
 
 """
@@ -95,20 +87,22 @@ non empty bin has at least one particle.
 """
 function optimal_selection!(E::TE, B::TB, v²::F, t::Int; allocation_resampler = systematic, within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
-   # zero out offspring counts
-   @. E.o = 0
-   @. B.target = 0
-   # ensure each nonempty bin has at least one particle
-   minimal_bin_allocation!(B)
-   n_particles = length(E)
-   # number of remaining particles to allocate
-   n_allocate = n_particles - sum(B.target)
-   # allocate remaining particles
-   optimal_allocation!(B, E, v², t, n_allocate, allocation_resampler = allocation_resampler)
-   # populate the particles
-   repopulate!(E, B, within_bin_resampler = within_bin_resampler)
+    # zero out offspring counts
+    @. E.o = 0
+    @. B.target = 0
+    # ensure each nonempty bin has at least one particle
+    minimal_bin_allocation!(B)
+    n_particles = length(E)
+    # number of remaining particles to allocate
+    n_allocate = n_particles - sum(B.target)
+    # allocate remaining particles
+    optimal_allocation!(B, E, v², t, n_allocate, allocation_resampler = allocation_resampler)
+    # set number of offspring of each particle
+    offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler);
+    # populate the particles
+    repopulate!(E, B);
 
-   E, B
+    E, B
 end
 
 """
@@ -126,18 +120,20 @@ non empty bin has at least one particle.
 """
 function targeted_selection!(E::TE, B::TB, G::F, t::Int; allocation_resampler = systematic, within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
-   # zero out offspring counts
-   @. E.o = 0
-   @. B.target = 0
-   # ensure each nonempty bin has at least one particle
-   minimal_bin_allocation!(B)
-   n_particles = length(E)
-   # number of remaining particles to allocate
-   n_allocate = n_particles - sum(B.target)
-   # allocate remaining particles
-   targeted_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
-   # populate the particles
-   repopulate!(E, B, within_bin_resampler = within_bin_resampler)
+    # zero out offspring counts
+    @. E.o = 0
+    @. B.target = 0
+    # ensure each nonempty bin has at least one particle
+    minimal_bin_allocation!(B)
+    n_particles = length(E)
+    # number of remaining particles to allocate
+    n_allocate = n_particles - sum(B.target)
+    # allocate remaining particles
+    targeted_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
+    # set number of offspring of each particle
+    offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler)
+    # populate the particles
+    repopulate!(E, B)
 
-   E, B
+    E, B
 end

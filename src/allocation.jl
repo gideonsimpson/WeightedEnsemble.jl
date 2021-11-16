@@ -92,3 +92,25 @@ function uniform_allocation!(B::TB, E::TE, n_allocate::Int; allocation_resampler
    B
 end
 
+"""
+`offspring_allocation!`: Once the number of offspring within each bin are set,
+allocate them amongst the particles within the bin.  This assumes that the bin
+allocations of the bins have completed.
+### Arguments
+* `E` - particle ensemble
+* `B` - bin data structure
+### Optional Arguments
+* `within_bin_resampler=multinomial` - resampling scheme within bins
+"""
+function offspring_allocation!(E::TE, B::TB; within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins}
+   n_particles = length(E)
+   non_empty_bins = findall(n -> n > 0, B.n)
+
+   # compute number of offspring of each particle bin by bin
+   for p in non_empty_bins
+      # get particle indices for bin p
+      particle_ids = findall(isequal(p), E.b)
+      @inbounds E.o[particle_ids] .+= within_bin_resampler(B.target[p], E.ω[particle_ids] / B.ν[p])
+   end
+   E 
+end
