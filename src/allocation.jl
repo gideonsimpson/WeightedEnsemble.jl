@@ -18,15 +18,15 @@ function, `G:(p, E, B, t) → [0,∞)` for bin `p`.  Empty bins are allocated ze
 children and nonempty bins are allocated ≥ 1 child.
 
 ### Arguments
-* `E` - particle ensemble
 * `B` - bin data structure
+* `E` - particle ensemble
 * `G` - target function
 * `t` - t-th seletion step
 * `n_allocate` - number of particles to allocate
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 """
-function targeted_allocation!(E::TE, B::TB, G::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
+function targeted_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
    # identify nonempty bins
    non_empty_bins = findall(n -> n > 0, B.n)
@@ -46,7 +46,7 @@ function targeted_allocation!(E::TE, B::TB, G::F, t::Int, n_allocate::Int; alloc
    end
    B.target .+= allocation_resampler(n_allocate, ρ)
 
-   E, B
+   B
 end
 
 """
@@ -54,15 +54,15 @@ end
 using a value function to approximate mutation variance.
 
 ### Arguments
-* `E` - particle ensemble
 * `B` - bin data structure
+* `E` - particle ensemble
 * `v²` - v² variance function estimator
 * `t` - t-th seletion step
 * `n_allocate` - number of particles to allocate 
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 """
-function optimal_allocation!(E::TE, B::TB, v²::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
+function optimal_allocation!(B::TB, E::TE, v²::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
    function G(p, E, B, t)
       particle_ids = findall(isequal(p), E.b)
@@ -70,9 +70,9 @@ function optimal_allocation!(E::TE, B::TB, v²::F, t::Int, n_allocate::Int; allo
       return bin_target
    end
 
-   targeted_allocation!(E, B, G, t, n_allocate, allocation_resampler = allocation_resampler)
+   targeted_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
 
-   E, B
+   B
 end
 
 """
@@ -80,15 +80,15 @@ end
 positive bin weight has at least one offspring.
 
 ### Arguments
-* `E` - particle ensemble
 * `B` - bin data structure
+* `E` - particle ensemble
 * `n_allocate` - number of particles to allocate
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 """
-function uniform_allocation!(E::TE, B::TB, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins}
+function uniform_allocation!(B::TB, E::TE, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins}
    G = (p, E, B, t) -> 1.0
-   targeted_allocation!(E, B, G, 0, n_allocate, allocation_resampler = allocation_resampler)
-   E, B
+   targeted_allocation!(B, E, G, 0, n_allocate, allocation_resampler = allocation_resampler)
+   B
 end
 

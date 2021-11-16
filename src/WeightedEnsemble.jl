@@ -20,10 +20,12 @@ include("bins.jl")
 include("resampling.jl")
 # Load allocation algorithms
 include("allocation.jl")
+export minimal_bin_allocation!, targeted_allocation!,
+    optimal_allocation!, uniform_allocation!
 # Load selection algorithms
 include("selection.jl")
 export trivial_selection!, uniform_selection!,
-    optimal_selection!, targeted_selection!
+    optimal_selection!, targeted_selection!, repopulate!
 # Load coarse model algorithms
 include("coarse_serial.jl")
 include("coarse_parallel.jl")
