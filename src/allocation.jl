@@ -27,6 +27,8 @@ a specified function, `G:(p, E, B, t) → [0,∞)` for bin `p`.
 """
 function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
+   n_bins = length(B);
+
    # identify nonempty bins
    non_empty_bins = findall(n -> n > 0, B.n)
    Ñ = zeros(n_bins)
