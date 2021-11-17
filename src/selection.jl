@@ -63,7 +63,7 @@ function uniform_selection!(E::TE, B::TB; allocation_resampler = systematic, wit
     # number of remaining particles to allocate
     n_allocate = n_particles - sum(B.target)
     # allocate remaining particles
-    uniform_allocation!(B, E, n_allocate, allocation_resampler = allocation_resampler)
+    uniform_bin_allocation!(B, E, n_allocate, allocation_resampler = allocation_resampler)
     # set number of offspring of each particle
     offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler)
     # populate the particles
@@ -96,7 +96,7 @@ function optimal_selection!(E::TE, B::TB, v²::F, t::Int; allocation_resampler =
     # number of remaining particles to allocate
     n_allocate = n_particles - sum(B.target)
     # allocate remaining particles
-    optimal_allocation!(B, E, v², t, n_allocate, allocation_resampler = allocation_resampler)
+    optimal_bin_allocation!(B, E, v², t, n_allocate, allocation_resampler = allocation_resampler)
     # set number of offspring of each particle
     offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler);
     # populate the particles
@@ -129,7 +129,7 @@ function targeted_selection!(E::TE, B::TB, G::F, t::Int; allocation_resampler = 
     # number of remaining particles to allocate
     n_allocate = n_particles - sum(B.target)
     # allocate remaining particles
-    targeted_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
+    targeted_bin_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
     # set number of offspring of each particle
     offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler)
     # populate the particles
