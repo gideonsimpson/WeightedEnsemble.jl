@@ -3,7 +3,6 @@ WE estimation of the probability of for a diffusion with X(0) = a satisfying
 X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
 =#
 
-
 using Statistics
 using Printf
 using WeightedEnsemble
@@ -38,8 +37,8 @@ f̃ = f.(voronoi_pts);
 _,v²_vectors = WeightedEnsemble.build_coarse_vectors(n_we_steps,K̃,float.(f̃));
 v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
 # define selection function
-selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation!(E, B, v², t)
-# selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
+# selection! = (E, B, t)-> optimal_selection!(E, B, v², t)
+selection! = (E, B, t)-> uniform_selection!(E, B)
 
 # set up sampler - trivial analysis step
 # we_sampler = WEsampler(mutation!, selection!, rebin!);
