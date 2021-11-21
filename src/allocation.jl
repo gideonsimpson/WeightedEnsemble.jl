@@ -14,7 +14,9 @@ end
 
 """
 `targeted_bin_allocation!`: Targeted allocation of particles amongst bins using
-a specified function, `G:(p, E, B, t) → [0,∞)` for bin `p`. 
+a specified function, `G:(p, E, B, t) → [0,∞)` for bin `p`. Falls back to
+uniform allocation amongst the non-empty bins in the event that this `G` fails
+to normalize.
 
 ### Arguments
 * `B` - bin data structure
@@ -22,7 +24,7 @@ a specified function, `G:(p, E, B, t) → [0,∞)` for bin `p`.
 * `G` - target function
 * `t` - t-th seletion step
 * `n_allocate` - number of particles to allocate
-### Optional Arguments
+  ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 """
 function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
@@ -40,10 +42,10 @@ function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; a
 
    if (sum(Ñ) > 0)
       # compute probabilities when this can be normalized
-      ρ .= Ñ / sum(Ñ)
+      ρ .= Ñ / sum(Ñ);
    else
-      # uniformly allocate amongst the bins 
-      ρ .= non_empty_bins / sum(non_empty_bins)
+      # fallback to uniformly allocation
+      ρ[non_empty_bins] .= 1.0 / length(non_empty_bins);
    end
    B.target .+= allocation_resampler(n_allocate, ρ)
 
