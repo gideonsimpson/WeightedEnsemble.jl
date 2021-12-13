@@ -5,7 +5,6 @@
 * `E` - particle ensemble
 """
 function trivial_selection!(E::TE) where {TE<:Ensemble}
-    @. E.o = 1
     @. E.ω̂ = E.ω
     @. E.b̂ = E.b
     @. E.ξ̂ = deepcopy(E.ξ)
@@ -65,7 +64,7 @@ function uniform_selection!(E::TE, B::TB; allocation_resampler = systematic, wit
     # allocate remaining particles
     uniform_bin_allocation!(B, E, n_allocate, allocation_resampler = allocation_resampler)
     # set number of offspring of each particle
-    offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler)
+    within_bin_allocation!(E, B, within_bin_resampler = within_bin_resampler)
     # populate the particles
     repopulate!(E, B)
 
@@ -95,10 +94,15 @@ function optimal_selection!(E::TE, B::TB, v²::F, t::Int; allocation_resampler =
     n_particles = length(E)
     # number of remaining particles to allocate
     n_allocate = n_particles - sum(B.target)
-    # allocate remaining particles
-    optimal_bin_allocation!(B, E, v², t, n_allocate, allocation_resampler = allocation_resampler)
-    # set number of offspring of each particle
-    offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler);
+    try
+        # allocate remaining particles
+        optimal_bin_allocation!(B, E, v², t, n_allocate, allocation_resampler = allocation_resampler);
+        # set number of offspring of each particle
+        within_bin_allocation!(E, B, within_bin_resampler = within_bin_resampler);
+    catch
+        # fall back to trivial allocation if optimal fails
+        trivial_allocation!(E, B);
+    end
     # populate the particles
     repopulate!(E, B);
 
@@ -128,10 +132,15 @@ function targeted_selection!(E::TE, B::TB, G::F, t::Int; allocation_resampler = 
     n_particles = length(E)
     # number of remaining particles to allocate
     n_allocate = n_particles - sum(B.target)
-    # allocate remaining particles
-    targeted_bin_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
-    # set number of offspring of each particle
-    offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler)
+    try
+        # allocate remaining particles
+        targeted_bin_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
+        # set number of offspring of each particle
+        offspring_allocation!(E, B, within_bin_resampler = within_bin_resampler)
+    catch
+        # fall back to trivial allocation if optimal fails        
+        trivial_allocation!(E, B)
+    end
     # populate the particles
     repopulate!(E, B)
 

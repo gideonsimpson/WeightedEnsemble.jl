@@ -1,3 +1,17 @@
+
+"""
+`trivial_allocation!`: Trivially allocate each particle to have one offspring.
+
+### Arguments
+* `E` - particle ensemble
+* `B` - bin data structure
+"""
+function trivial_allocation!(E::TE, B::TB) where {TE<:Ensemble, TB<:Bins}
+   @. E.o = 1;
+   @. B.target = B.n;
+   E, B
+end
+
 """
 `minimal_bin_allocation!`: Allocates a single particle to be spawned within each
 nonempty bin
@@ -29,25 +43,20 @@ to normalize.
 """
 function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
-   n_bins = length(B);
+   n_bins = length(B)
 
    # identify nonempty bins
-   non_empty_bins = findall(n -> n > 0, B.n)
-   Ñ = zeros(n_bins)
-   ρ = zeros(n_bins)
+   non_empty_bins = findall(n -> n > 0, B.n);
+   Ñ = zeros(n_bins);
+   ρ = zeros(n_bins);
 
    for p in non_empty_bins
-      Ñ[p] = G(p, E, B, t)
+      Ñ[p] = G(p, E, B, t);
    end
 
-   if (sum(Ñ) > 0)
-      # compute probabilities when this can be normalized
-      ρ .= Ñ / sum(Ñ);
-   else
-      # fallback to uniformly allocation
-      ρ[non_empty_bins] .= 1.0 / length(non_empty_bins);
-   end
-   B.target .+= allocation_resampler(n_allocate, ρ)
+   # compute probabilities when this can be normalized
+   ρ .= Ñ / sum(Ñ);
+   B.target .+= allocation_resampler(n_allocate, ρ);
 
    B
 end
@@ -95,7 +104,7 @@ function uniform_bin_allocation!(B::TB, E::TE, n_allocate::Int; allocation_resam
 end
 
 """
-`offspring_allocation!`: Once the number of offspring within each bin are set,
+`within_bin_allocation!`: Once the number of offspring within each bin are set,
 allocate them amongst the particles within the bin.  This assumes that the bin
 allocations of the bins have completed.
 
@@ -105,7 +114,7 @@ allocations of the bins have completed.
 ### Optional Arguments
 * `within_bin_resampler=multinomial` - resampling scheme within bins
 """
-function offspring_allocation!(E::TE, B::TB; within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins}
+function within_bin_allocation!(E::TE, B::TB; within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins}
    n_particles = length(E)
    non_empty_bins = findall(n -> n > 0, B.n)
 
@@ -115,5 +124,5 @@ function offspring_allocation!(E::TE, B::TB; within_bin_resampler = multinomial)
       particle_ids = findall(isequal(p), E.b)
       @inbounds E.o[particle_ids] .+= within_bin_resampler(B.target[p], E.ω[particle_ids] / B.ν[p])
    end
-   E 
+   E
 end
