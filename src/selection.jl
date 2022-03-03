@@ -67,7 +67,6 @@ function uniform_selection!(E::TE, B::TB; allocation_resampler = systematic, wit
         # set number of offspring of each particle
         within_bin_allocation!(E, B, within_bin_resampler = within_bin_resampler)
     catch
-        println("FAILED ALLOCATION");
         # fall back to trivial allocation if uniform fails
         trivial_allocation!(E, B);
     end
