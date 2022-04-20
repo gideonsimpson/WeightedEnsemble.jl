@@ -66,9 +66,14 @@ function uniform_selection!(E::TE, B::TB; allocation_resampler = systematic, wit
         uniform_bin_allocation!(B, E, n_allocate, allocation_resampler = allocation_resampler)
         # set number of offspring of each particle
         within_bin_allocation!(E, B, within_bin_resampler = within_bin_resampler)
-    catch
+    catch e
         # fall back to trivial allocation if uniform fails
-        trivial_allocation!(E, B);
+        if e isa DomainError
+            @printf("[%d]: TRIVIAL ALLOCATION\n", t)
+            trivial_allocation!(E, B)
+        else
+            rethrow()
+        end
     end
     # populate the particles
     repopulate!(E, B)
@@ -104,9 +109,14 @@ function optimal_selection!(E::TE, B::TB, v²::F, t::Int; allocation_resampler =
         optimal_bin_allocation!(B, E, v², t, n_allocate, allocation_resampler = allocation_resampler);
         # set number of offspring of each particle
         within_bin_allocation!(E, B, within_bin_resampler = within_bin_resampler);
-    catch
+    catch e
         # fall back to trivial allocation if optimal fails
-        trivial_allocation!(E, B);
+        if e isa DomainError
+            @printf("[%d]: TRIVIAL ALLOCATION\n", t)
+            trivial_allocation!(E, B)
+        else
+            rethrow()
+        end
     end
     # populate the particles
     repopulate!(E, B);
@@ -142,9 +152,14 @@ function targeted_selection!(E::TE, B::TB, G::F, t::Int; allocation_resampler = 
         targeted_bin_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
         # set number of offspring of each particle
         within_bin_allocation!(E, B, within_bin_resampler=within_bin_resampler)
-    catch
+    catch e
         # fall back to trivial allocation if targeted fails        
-        trivial_allocation!(E, B)
+        if e isa DomainError
+            @printf("[%d]: TRIVIAL ALLOCATION\n",t);
+            trivial_allocation!(E, B)
+        else
+            rethrow()
+        end
     end
     # populate the particles
     repopulate!(E, B)
