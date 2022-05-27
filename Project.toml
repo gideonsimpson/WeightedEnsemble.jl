@@ -1,7 +1,7 @@
 name = "WeightedEnsemble"
 uuid = "2ce787d3-4051-4cdf-8936-a84ea813ca1e"
 authors = ["Gideon Simpson <gideon.simpson@gmail.com>"]
-version = "0.5.5"
+version = "0.5.6"
 
 [deps]
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
