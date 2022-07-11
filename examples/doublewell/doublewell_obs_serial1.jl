@@ -21,7 +21,7 @@ B₀, bin_id, rebin! = setup_Voronoi_bins(voronoi_pts);
 opts = MDOptions(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
 mutation! = x-> sample_trajectory!(x, sampler, options=opts);
 
-selection! = (E, B, t)-> uniform_selection!(E, B);
+selection! = (E, B, t)-> uniform_selection!(E, B, t);
 we_sampler = WEsampler(mutation!, selection!, rebin!);
 
 f = x-> Float64(-0.1 < x[1] < 0.1); # define observable

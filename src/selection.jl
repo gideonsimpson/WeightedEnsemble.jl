@@ -47,11 +47,12 @@ positive bin weight has at least one offspring.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
+* `t` - t-th seletion step
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 * `within_bin_resampler=multinomial` - resampling scheme within bins
 """
-function uniform_selection!(E::TE, B::TB; allocation_resampler = systematic, within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins}
+function uniform_selection!(E::TE, B::TB, t::Int; allocation_resampler = systematic, within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins}
 
     # zero out offspring counts
     @. E.o = 0
