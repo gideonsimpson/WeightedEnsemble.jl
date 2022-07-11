@@ -102,7 +102,7 @@ Langevin equation.
 * Update examples
 
 # Acknowledgements
-This work was supported in part by the US National Science Foundation Grant DMS-1818716.
+This work was supported in part by the US National Science Foundation Grants DMS-1818716 and DMS-2111278.
 
 # References
 
