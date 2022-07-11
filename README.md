@@ -110,3 +110,4 @@ This work was supported in part by the US National Science Foundation Grants DMS
 2. _Optimizing weighted ensemble sampling of steady states_, D. Aristoff and D.M. Zuckerman, arXiv:1806.00860. [(Link)](https://arxiv.org/abs/1806.00860)
 3. _An ergodic theorem for weighted ensemble_, D. Aristoff, arXiv:1906.00856. [(Link)](https://arxiv.org/abs/1906.00856)
 4. _Parallel replica dynamics method for bistable stochastic reaction networks: Simulation and sensitivity analysis_, T. Wang and P. Plecháč, J. Chem. Phys., 147, 234110, 2017. [(Link)](https://doi.org/10.1063/1.5017955)
+5. _A splitting method to reduce MCMC variance_, R.J. Webber, D. Aristoff, G.  Simpson, arXiv:2011.13899. [(Link)](https://arxiv.org/abs/2011.13899)
