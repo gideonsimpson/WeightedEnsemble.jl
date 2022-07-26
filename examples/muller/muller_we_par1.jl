@@ -5,7 +5,6 @@ satisfying X(T) ∈ B for the Muller potential.
 
 using Distributed
 using Statistics
-using HypothesisTests
 using Printf
 
 # addprocs(4);
@@ -43,25 +42,25 @@ end
 
 Random.seed!(100);
 x0_vals = copy(voronoi_pts);
-bin0_vals = bin_id.(voronoi_pts);
 n_bins = length(B₀);
-K̃ = WeightedEnsemble.pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals,bin0_vals, n_bins, n_samples_per_bin);
+K̃ = WeightedEnsemble.pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, n_bins, n_samples_per_bin);
 
 # define coarse observable as a bin function
 f̃ = f.(voronoi_pts);
 _,v²_vectors = WeightedEnsemble.build_coarse_vectors(n_we_steps,K̃,float.(f̃));
 v² = (x,t)-> v²_vectors[t+1][bin_id(x)]
-selection! = (E, B, t)-> WeightedEnsemble.optimal_allocation!(E, B, v², t)
+selection! = (E, B, t)-> optimal_selection!(E, B, v², t)
 
+we_sampler = DistributedWEsampler(mutation, selection!, rebin!);
 
 # set up ensemble
-E₀ = WeightedEnsemble.Dirac_to_EnsembleWithBins(x₀, n_particles);
+E₀ = Dirac_to_Ensemble(x₀, n_particles);
 rebin!(E₀, B₀, 0);
 
 # run
 E = deepcopy(E₀);
 B = deepcopy(B₀);
 Random.seed!(200)
-prun_we!(E, B, mutation,selection!, rebin!, n_we_steps);
+prun_we!(E, B, we_sampler, n_we_steps);
 p_est = f.(E.ξ) ⋅ E.ω
 @printf("WE Estimate = %g\n", p_est)

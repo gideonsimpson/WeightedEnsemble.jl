@@ -12,8 +12,9 @@ using TestLandscapes: Muller
 
 #  set up potential
 V = x-> Muller(x)
-cfg = ForwardDiff.GradientConfig(V, zeros(Float64,2));
-∇V! = (gradV, X) -> ForwardDiff.gradient!(gradV, V, X, cfg);
+# commented out due to threading issue with ForwardDiff
+# cfg = ForwardDiff.GradientConfig(V, zeros(Float64,2));
+∇V! = (gradV, X) -> ForwardDiff.gradient!(gradV, V, X);
 
 # Identify minima for defining x₀ and target set B
 mins=[optimize(V, x) for x in [[-0.5, 1.5],[0., 0.5],[0.5, 0.]]];

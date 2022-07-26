@@ -1,32 +1,40 @@
 #=
-WE estimation of the probability of for a diffusion with X(0) = a satisfying
-X(T) ∈ (b, ∞) for the double well potential V(x) = (x²-1)².
+WE estimation of the probability of for a diffusion with X(0) = x₀ satisfying
+X(T) ∈ B for the Muller potential.
 =#
 
 using Statistics
 using Printf
-using WeightedEnsemble
 
-include("doublewell_setup.jl");
+include("muller_setup.jl");
+using WeightedEnsemble
 
 # number of coarse steps in WE
 n_we_steps = 10;
 # number of time steps during mutation step
-nΔt_coarse = nΔt ÷ n_we_steps;
+nΔt_coarse = Int(nΔt / n_we_steps);
 # number of samples in coarse matrix
-n_samples_per_bin = 10^3;
+n_samples_per_bin = 10^2;
 # ensemble size
 n_particles = 10^2;
 
-# define bin structure
-voronoi_pts = [[x] for x in LinRange(a - 0.1, b + 0.1, 21)];
+# define bin structure using Voronoi
+xc = LinRange(-1.5, 1, 7)
+yc = LinRange(-0.5, 2, 7)
+voronoi_pts = Array{Float64,1}[];
+for x in xc, y in yc
+    # only include points that are likely to be accessed
+    if (V([x, y]) < 250)
+        push!(voronoi_pts, [x, y])
+    end
+end
 B₀, bin_id, rebin! = setup_Voronoi_bins(voronoi_pts);
 
-# define the mutation mapping
 opts = MDOptions(n_iters = nΔt_coarse, n_save_iters = nΔt_coarse)
 mutation! = x -> sample_trajectory!(x, sampler, options = opts);
 
-# construct coarse model matrix
+
+# construct coarse model
 Random.seed!(100);
 x0_vals = copy(voronoi_pts);
 n_bins = length(B₀);
@@ -37,8 +45,9 @@ f̃ = f.(voronoi_pts);
 _, v²_vectors = WeightedEnsemble.build_coarse_vectors(n_we_steps, K̃, float.(f̃));
 v² = (x, t) -> v²_vectors[t+1][bin_id(x)]
 # define selection function
-# selection! = (E, B, t) -> optimal_selection!(E, B, v², t)
-selection! = (E, B, t) -> uniform_selection!(E, B, t)
+selection! = (E, B, t)-> optimal_selection!(E, B, v², t)
+# selection! = (E, B, t)-> uniform_selection!(E, B, t)
+
 we_sampler = WEsampler(mutation!, selection!, rebin!);
 
 # set up ensemble

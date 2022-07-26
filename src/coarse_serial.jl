@@ -9,94 +9,30 @@
 * `x0_vals` - an array of starting values
 * `bin0_vals` - an array of the bins corresponding to `x0_vals`
 * `n_bins` - total number of bins
-* `n_samples` - number of trials for each sample
+* `n_trials` - number of independent trials for each x0 starting value
 """
-function build_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
+function build_coarse_transition_matrix(mutation!, bin_id, x0_vals, n_bins, n_trials)
 
-   X = similar(x0_vals[1]);
-   K = spzeros(n_bins, n_bins);
-
-   for k in 1:n_samples, l in 1:length(x0_vals)
-      X .= deepcopy(x0_vals[l]);
-      i = bin0_vals[l];
-      mutation!(X);
-      j = bin_id(X);
-      K[i,j] +=1.0;
-   end
-
-   @. K = K/n_samples;
-
-   return K
-end
-
-"""
-`tbuild_coarse_transition_matrix`: Contruct a transition matrix amongst the bins
-(multithreaded version).
-
-### Arguments
-* `mutation!` - an in place mutation function
-* `bin_id` - bin identification function
-* `x0_vals` - an array of starting values
-* `bin0_vals` - an array of the bins corresponding to `x0_vals`
-* `n_bins` - total number of bins
-* `n_samples` - number of trials for each sample
-"""
-function tbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
-
-   X = similar(x0_vals[1]);
-   K = spzeros(n_bins, n_bins);
-   jvals = zeros(Int, n_samples);
-
-   for l in 1:length(x0_vals)
-      i = bin0_vals[l];
-      Threads.@threads for k in 1:n_samples
-         X .= deepcopy(x0_vals[l]);
-         mutation!(X);
-         jvals[k] = bin_id(X);
-      end
-      
-      for j in jvals
-         K[i,j] +=1.0;
-      end
-   end
-
-   @. K = K/n_samples;
-
-   return K
-end
-
-
-"""
-`pbuild_coarse_transition_matrix`: Contruct a transition matrix amongst the
-bins in parallel.  It assumed that a pool of workers has already been
-contructed.  Returns a sparse matrix.
-
-### Arguments
-* `mutation!` - an in place mutation function
-* `bin_id` - bin identification function
-* `x0_vals` - an array of starting values
-* `bin0_vals` - an array of the bins corresponding to `x0_vals`
-* `n_bins` - total number of bins
-* `n_samples` - number of trials for each sample
-"""
-
-function pbuild_coarse_transition_matrix(mutation!, bin_id, x0_vals, bin0_vals, n_bins, n_samples)
    n_x0 = length(x0_vals);
-   row_vals = SharedArray{Float64}(n_x0*n_samples);
-   col_vals = SharedArray{Float64}(n_x0*n_samples);
    X = similar(x0_vals[1]);
+   row_vals = zeros(Int, n_x0*n_trials);
+   col_vals = zeros(Int,n_x0*n_trials);
 
-   @sync @distributed for k in 1:n_samples
+   for k in 1:n_trials
       for l in 1:n_x0
-         X .= copy(x0_vals[l]);
-         row_vals[n_x0*(k-1) + l] = bin0_vals[l];
+         X .= deepcopy(x0_vals[l]);
+         row_vals[n_x0*(k-1) + l] = bin_id(X);
          mutation!(X);
-         col_vals[n_x0*(k-1) + l] = bin_id(X);
+         col_vals[n_x0*(k-1) + l] = bin_id(X);         
       end
    end
 
    K = sparse(row_vals,col_vals,ones(size(row_vals)),n_bins, n_bins);
-   @. K = K/n_samples;
+   for i in 1:n_bins
+      rowZ = sum(K[i,:]);
+      @. K[i,:] = K[i,:]/rowZ; 
+   end
+
    return K
 end
 
@@ -140,7 +76,8 @@ end
 """
 `build_coarse_poisson`: Construct the solution to the Poisson problem and the
 1-step variance approximation on the coarser model given the transition matrix,
-`K̃`, and a coarse scale QoI function, `f̃`.
+`K̃`, and a coarse scale QoI function, `f̃`.  This solves it using Julia's
+linear solver.
 
 ### Arguments
 * `K̃` - coarse scale transition matrix
@@ -153,7 +90,8 @@ function build_coarse_poisson(K̃, f̃)
    μ̃ = real.(evecs[:,1]);μ̃ .= μ̃/ sum(μ̃); #normalize the invariant measure
 
    # compute solution to Poisson
-   h̃ = (I - K̃)\(f̃ .- μ̃ ⋅ f̃); 
+   # NOTE: this may fail
+   h̃ =(I - K̃)\ (f̃ .- μ̃ ⋅ f̃); 
    # normalize
    h̃ = h̃ .- μ̃⋅h̃;
    K̃h̃ = K̃*h̃;

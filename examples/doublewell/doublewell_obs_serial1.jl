@@ -1,5 +1,4 @@
 using Statistics
-using HypothesisTests
 using Printf
 using WeightedEnsemble
 
@@ -8,7 +7,7 @@ include("doublewell_setup.jl");
 # number of coarse steps in WE
 n_we_steps = 10;
 # number of time steps during mutation step
-nΔt_coarse = ceil(Int,nΔt/n_we_steps);
+nΔt_coarse =  nΔt÷n_we_steps;
 # number of samples in coarse matrix
 n_samples_per_bin = 10^2;
 # ensemble size
@@ -22,13 +21,14 @@ B₀, bin_id, rebin! = setup_Voronoi_bins(voronoi_pts);
 opts = MDOptions(n_iters=nΔt_coarse, n_save_iters = nΔt_coarse)
 mutation! = x-> sample_trajectory!(x, sampler, options=opts);
 
-selection! = (E, B, t)-> WeightedEnsemble.uniform_allocation!(E, B);
+selection! = (E, B, t)-> uniform_selection!(E, B, t);
+we_sampler = WEsampler(mutation!, selection!, rebin!);
 
 f = x-> Float64(-0.1 < x[1] < 0.1); # define observable
 
 # set up ensemble
-E₀ = WeightedEnsemble.Dirac_to_EnsembleWithBins(x₀, n_particles);
+E₀ = Dirac_to_Ensemble(x₀, n_particles);
 rebin!(E₀, B₀, 0);
 
 Random.seed!(200)
-f_trajectory = WeightedEnsemble.run_we_observables(E₀, B₀, mutation!, selection!, rebin!, n_we_steps, (f,));
+f_trajectory = WeightedEnsemble.run_we_observables(E₀, B₀, we_sampler, n_we_steps, (f,));
