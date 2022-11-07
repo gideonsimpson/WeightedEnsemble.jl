@@ -71,6 +71,8 @@ function uniform_selection!(E::TE, B::TB, t::Int; allocation_resampler = systema
         # fall back to trivial allocation if uniform fails
         if e isa DomainError
             @printf("[%d]: TRIVIAL ALLOCATION\n", t)
+            jldsave(@sprintf("trivial_debug_%d.jld2", t); E, B);
+            @printf("[%d]: SAVED TO DISK\n", t)
             trivial_allocation!(E, B)
         else
             rethrow()
