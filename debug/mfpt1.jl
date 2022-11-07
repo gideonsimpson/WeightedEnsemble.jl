@@ -8,7 +8,7 @@ seed = 100;
 b = 0.5 # target set [b, ∞)
 x0 = [-1.0] # starting point
 
-T = 10^2 # terminal time
+T = 10^1 # terminal time
 
 
 Δt = 1e-2  # time step

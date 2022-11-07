@@ -62,6 +62,12 @@ function uniform_selection!(E::TE, B::TB, t::Int; allocation_resampler = systema
     n_particles = length(E)
     # number of remaining particles to allocate
     n_allocate = n_particles - sum(B.target)
+
+    if(t ∈ 125:135)
+        jldsave(@sprintf("trivial_debug_%d.jld2", t); E, B);
+        @printf("[%d]: SAVED TO DISK\n", t)
+    end
+
     try
         # allocate remaining particles
         uniform_bin_allocation!(B, E, n_allocate, allocation_resampler = allocation_resampler)
@@ -71,8 +77,6 @@ function uniform_selection!(E::TE, B::TB, t::Int; allocation_resampler = systema
         # fall back to trivial allocation if uniform fails
         if e isa DomainError
             @printf("[%d]: TRIVIAL ALLOCATION\n", t)
-            jldsave(@sprintf("trivial_debug_%d.jld2", t); E, B);
-            @printf("[%d]: SAVED TO DISK\n", t)
             trivial_allocation!(E, B)
         else
             rethrow()
