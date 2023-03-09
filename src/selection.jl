@@ -63,7 +63,7 @@ function uniform_selection!(E::TE, B::TB, t::Int; allocation_resampler = systema
     # number of remaining particles to allocate
     n_allocate = n_particles - sum(B.target)
 
-    if(t ∈ 125:135)
+    if(t ∈ 305:315)
         jldsave(@sprintf("trivial_debug_%d.jld2", t); E, B);
         @printf("[%d]: SAVED TO DISK\n", t)
     end

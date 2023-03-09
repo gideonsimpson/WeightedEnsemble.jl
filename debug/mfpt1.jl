@@ -8,7 +8,7 @@ seed = 100;
 b = 0.5 # target set [b, ∞)
 x0 = [-1.0] # starting point
 
-T = 10^1 # terminal time
+T = 4 # terminal time
 
 
 Δt = 1e-2  # time step
@@ -27,6 +27,7 @@ n_bins = length(x_voronoi)
 @show n_particles;
 @show Δb;
 @show n_bins;
+@show x_voronoi;
 
 include("setup1.jl");
 
