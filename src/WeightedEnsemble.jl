@@ -12,6 +12,8 @@ using Arpack
 
 # Load types
 include("types.jl")
+# Load default values
+include("defaults.jl")
 # Load data structures
 include("ensemble.jl")
 include("bins.jl")

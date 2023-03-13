@@ -14,15 +14,20 @@ end
 
 """
 `minimal_bin_allocation!`: Allocates a single particle to be spawned within each
-nonempty bin
+nonempty bin and the current number of particles in any bin with less than νmin
+total mass.
 
 ### Arguments
 * `B` - bin data structure
 """
-function minimal_bin_allocation!(B::TB) where {TB<:Bins}
+function minimal_bin_allocation!(B::TB; νmin=νmin) where {TB<:Bins}
 
    # increment the number of offspring by one for each nonempty bin
-   @. B.target += (B.n > 0)
+   @. B.target += (B.ν > 0)
+   # set the number of offspring to be the same for any trivial (small mass) bins
+   trivial_bins = findall(ν -> ν ≤ νmin, B.ν);
+   @. B.target[trivial_bins] = B.n[trivial_bins];
+
    B
 end
 
@@ -41,16 +46,17 @@ to normalize.
   ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 """
-function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
+function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; allocation_resampler = systematic, νmin=νmin) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
    n_bins = length(B)
 
-   # identify nonempty bins
-   non_empty_bins = findall(n -> n > 0, B.n);
+   # identify bins with nontrivial amount of mass
+   nontrivial_bins = findall(ν -> ν > νmin, B.ν);
+
    Ñ = zeros(n_bins);
    ρ = zeros(n_bins);
 
-   for p in non_empty_bins
+   for p in nontrivial_bins
       Ñ[p] = G(p, E, B, t);
    end
 
@@ -74,7 +80,7 @@ using a value function to approximate mutation variance.
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 """
-function optimal_bin_allocation!(B::TB, E::TE, v²::F, t::Int, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins,F<:Function}
+function optimal_bin_allocation!(B::TB, E::TE, v²::F, t::Int, n_allocate::Int; allocation_resampler = systematic, νmin=νmin) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
    function G(p, E, B, t)
       particle_ids = findall(isequal(p), E.b)
@@ -82,7 +88,7 @@ function optimal_bin_allocation!(B::TB, E::TE, v²::F, t::Int, n_allocate::Int; 
       return bin_target
    end
 
-   targeted_bin_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler)
+   targeted_bin_allocation!(B, E, G, t, n_allocate, allocation_resampler = allocation_resampler, νmin=νmin)
 
    B
 end
@@ -97,9 +103,9 @@ end
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
 """
-function uniform_bin_allocation!(B::TB, E::TE, n_allocate::Int; allocation_resampler = systematic) where {TE<:Ensemble,TB<:Bins}
+function uniform_bin_allocation!(B::TB, E::TE, n_allocate::Int; allocation_resampler = systematic, νmin=νmin) where {TE<:Ensemble,TB<:Bins}
    G = (p, E, B, t) -> 1.0
-   targeted_bin_allocation!(B, E, G, 0, n_allocate, allocation_resampler = allocation_resampler)
+   targeted_bin_allocation!(B, E, G, 0, n_allocate, allocation_resampler = allocation_resampler, νmin=νmin)
    B
 end
 
