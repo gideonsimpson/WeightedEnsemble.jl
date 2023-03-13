@@ -37,3 +37,6 @@ scratch/
 
 # vs code folder
 .vscode/*
+
+# output files
+*.jld2
