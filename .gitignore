@@ -40,3 +40,6 @@ scratch/
 
 # output files
 *.jld2
+
+# notebook checkpoints 
+.ipynb_checkpoints

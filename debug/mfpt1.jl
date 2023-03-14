@@ -31,10 +31,21 @@ n_bins = length(x_voronoi)
 
 include("setup1.jl");
 
-uni_we_sampler = WEsampler(mutation!, uniform_selection!, rebin!);
+# uni! = (E, B, t) -> uniform_selection!(E, B, t, νmin= 0.);
+uni! = (E, B, t) -> uniform_selection!(E, B, t, νmin=1e-10);
+
+uni_we_sampler = WEsampler(mutation!, uni!, rebin!);
 
 Random.seed!(seed);
+E = deepcopy(E0);
+B = deepcopy(B0);
+@show sum(E.ω);
+@show sum(B.ν);
+run_we!(E, B, uni_we_sampler, n_we_steps);
+@show sum(E.ω);
+@show sum(B.ν);
+
 # E_trajectory, B_trajectory = run_we(E0, B0, uni_we_sampler, n_we_steps);
-f_trajectory = run_we_observables(E0, B0, uni_we_sampler, n_we_steps - 1, (fB,))[:];
-prepend!(f_trajectory, fB.(E0.ξ) ⋅ E0.ω);
+# f_trajectory = run_we_observables(E0, B0, uni_we_sampler, n_we_steps - 1, (fB,))[:];
+# prepend!(f_trajectory, fB.(E0.ξ) ⋅ E0.ω);
 

@@ -22,11 +22,14 @@ total mass.
 """
 function minimal_bin_allocation!(B::TB; νmin=νmin) where {TB<:Bins}
 
-   # increment the number of offspring by one for each nonempty bin
-   @. B.target += (B.ν > 0)
+   n_bins = length(B)
+
+   # increment the number of offspring by one for each nontrivial bin
+   nontrivial_bins = findall(ν -> ν ≥ νmin, B.ν)
+   @. B.target[nontrivial_bins] = 1
    # set the number of offspring to be the same for any trivial (small mass) bins
-   trivial_bins = findall(ν -> ν ≤ νmin, B.ν);
-   @. B.target[trivial_bins] = B.n[trivial_bins];
+   trivial_bins = setdiff(1:n_bins, nontrivial_bins)
+   @. B.target[trivial_bins] = B.n[trivial_bins]
 
    B
 end
@@ -51,7 +54,7 @@ function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; a
    n_bins = length(B)
 
    # identify bins with nontrivial amount of mass
-   nontrivial_bins = findall(ν -> ν > νmin, B.ν);
+   nontrivial_bins = findall(ν -> ν ≥ νmin, B.ν);
 
    Ñ = zeros(n_bins);
    ρ = zeros(n_bins);
@@ -121,7 +124,7 @@ allocations of the bins have completed.
 * `within_bin_resampler=multinomial` - resampling scheme within bins
 """
 function within_bin_allocation!(E::TE, B::TB; within_bin_resampler = multinomial) where {TE<:Ensemble,TB<:Bins}
-   n_particles = length(E)
+   
    non_empty_bins = findall(n -> n > 0, B.n)
 
    # compute number of offspring of each particle bin by bin
