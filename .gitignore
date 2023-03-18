@@ -37,3 +37,9 @@ scratch/
 
 # vs code folder
 .vscode/*
+
+# output files
+*.jld2
+
+# notebook checkpoints 
+.ipynb_checkpoints

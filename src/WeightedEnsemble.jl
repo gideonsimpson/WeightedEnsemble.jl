@@ -9,9 +9,12 @@ using SharedArrays
 using StatsBase
 using Distributions
 using Arpack
+# using JLD2
 
 # Load types
 include("types.jl")
+# Load default values
+include("defaults.jl")
 # Load data structures
 include("ensemble.jl")
 include("bins.jl")
