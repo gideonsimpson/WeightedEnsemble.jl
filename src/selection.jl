@@ -23,10 +23,14 @@ the particles over.
 ### Optional Arguments
 """
 function repopulate!(E::TE, B::TB) where {TE<:Ensemble,TB<:Bins}
+    
+    # number of allocated particles <= number of particles
     n_particles = length(E)
+    n_allocated = sum(B.target); 
+    n_zero_mass = n_particles - n_allocated;
     n_spawned = 0
-    # copy over the particles
-    for i = 1:n_particles
+    # copy over the particles allocated by the bin allocation
+    for i = 1:n_allocated
         # identify the bin of the current particle
         @inbounds bin = E.b[i]
         for k = 1:E.o[i]
@@ -37,6 +41,21 @@ function repopulate!(E::TE, B::TB) where {TE<:Ensemble,TB<:Bins}
         end
         @inbounds n_spawned += E.o[i]
     end
+
+    # zero mass particles are allocated to maintain a fixed total particle
+    # count.  For simplicity, just copy over particles 1,...,n_zero_mass, but
+    # given them zero weight.
+    if(n_zero_mass>0)
+        @printf(" ZERO MASS ALLOCATION, %d\n", n_zero_mass)
+    end
+
+    for i in 1:n_zero_mass
+        @inbounds E.ξ̂[i+n_allocated] = deepcopy(E.ξ[i])
+        @inbounds E.ω̂[i+n_allocated] = 0;
+        @inbounds E.b̂[i+n_allocated] = E.b[i];
+        @inbounds E.d̂[i+n_allocated] = deepcopy(E.d[i])
+    end
+
     E, B
 end
 
@@ -62,11 +81,6 @@ function uniform_selection!(E::TE, B::TB, t::Int; allocation_resampler = systema
     n_particles = length(E)
     # number of remaining particles to allocate
     n_allocate = n_particles - sum(B.target)
-
-    # if(t ∈ 305:315)
-    #     jldsave(@sprintf("trivial_debug_%d.jld2", t); E, B);
-    #     @printf("[%d]: SAVED TO DISK\n", t)
-    # end
 
     try
         # allocate remaining particles
@@ -163,6 +177,41 @@ function targeted_selection!(E::TE, B::TB, G::F, t::Int; allocation_resampler = 
         # fall back to trivial allocation if targeted fails        
         if e isa DomainError
             @printf("[%d]: TRIVIAL ALLOCATION\n",t);
+            trivial_allocation!(E, B)
+        else
+            rethrow()
+        end
+    end
+    # populate the particles
+    repopulate!(E, B)
+
+    E, B
+end
+
+"""
+`static_selection!`: Select particles according to a static allocation rule.  If
+the number of allocated particles is < N, the remaining particles are assigned
+zero weight.
+
+### Arguments
+* `E` - particle ensemble
+* `B` - bin data structure
+* `static_allocate` - array of predetermined bin allocation numbers
+### Optional Arguments
+* `within_bin_resampler=multinomial` - resampling scheme within bins
+"""
+function static_selection!(E::TE, B::TB, static_allocate::Vector{Int}; within_bin_resampler=multinomial, ωmin=ωmin) where {TE<:Ensemble,TB<:Bins}
+
+    # zero out offspring counts
+    @. E.o = 0
+    @. B.target = 0
+    try
+        static_bin_allocation!(B, static_allocate, ωmin=ωmin)
+        within_bin_allocation!(E, B, within_bin_resampler=within_bin_resampler)
+    catch e
+        # fall back to trivial allocation if uniform fails
+        if e isa DomainError
+            @printf("[%d]: TRIVIAL ALLOCATION\n", t)
             trivial_allocation!(E, B)
         else
             rethrow()
