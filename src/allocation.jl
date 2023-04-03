@@ -142,9 +142,10 @@ allocations of the bins have completed.
 """
 function within_bin_allocation!(E::TE, B::TB; within_bin_resampler=multinomial) where {TE<:Ensemble,TB<:Bins}
 
-   non_empty_bins = findall(n -> n > 0, B.n)
+   # identify bins that have a nonzero number of offspring
+   non_empty_bins = findall(j -> j > 0, B.target)
 
-   # compute number of offspring of each particle bin by bin
+   # compute number of offspring of each particle bin by bin for bins that will have offspring
    for p in non_empty_bins
       # get particle indices for bin p
       particle_ids = findall(isequal(p), E.b)
