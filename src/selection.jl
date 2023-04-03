@@ -30,7 +30,7 @@ function repopulate!(E::TE, B::TB) where {TE<:Ensemble,TB<:Bins}
     n_zero_mass = n_particles - n_allocated;
     n_spawned = 0
     # copy over the particles allocated by the bin allocation
-    for i = 1:n_allocated
+    for i = 1:n_particles
         # identify the bin of the current particle
         @inbounds bin = E.b[i]
         for k = 1:E.o[i]

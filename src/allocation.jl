@@ -48,9 +48,10 @@ function static_bin_allocation!(B::TB, static_allocate::Vector{Int}; ωmin=ωmin
 
    # set the number of offspring according to the static allocation, subject to
    # the ωmin constraint
-   @. B.target[nontrivial_bins] = min(static_allocate, floor(Int, B.ν/ωmin));
+   @. B.target = Int(min(static_allocate, floor(B.ν/ωmin)));
    B
 end
+
 """
 `targeted_bin_allocation!`: Targeted allocation of particles amongst bins using
 a specified function, `G:(p, E, B, t) → [0,∞)` for bin `p`. Falls back to
