@@ -42,13 +42,13 @@ total mass.
 
 ### Arguments
 * `B` - bin data structure
-* `static_allocate` - array of predetermined bin allocation numbers
+* `n_static` - array of predetermined bin allocation numbers
 """
-function static_bin_allocation!(B::TB, static_allocate::Vector{Int}; ωmin=ωmin) where {TB<:Bins}
+function static_bin_allocation!(B::TB, n_static::Vector{Int}; ωmin=ωmin) where {TB<:Bins}
 
    # set the number of offspring according to the static allocation, subject to
    # the ωmin constraint
-   @. B.target = Int(min(static_allocate, floor(B.ν/ωmin)));
+   @. B.target = Int(min(n_static, floor(B.ν / ωmin)))
    B
 end
 
