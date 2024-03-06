@@ -9,9 +9,12 @@ using SharedArrays
 using StatsBase
 using Distributions
 using Arpack
+# using JLD2
 
 # Load types
 include("types.jl")
+# Load default values
+include("defaults.jl")
 # Load data structures
 include("ensemble.jl")
 include("bins.jl")
@@ -21,11 +24,13 @@ include("resampling.jl")
 include("allocation.jl")
 export trivial_allocation!, minimal_bin_allocation!, 
     targeted_bin_allocation!, optimal_bin_allocation!, 
-    uniform_bin_allocation!, within_bin_allocation!
+    uniform_bin_allocation!, within_bin_allocation!,
+    static_bin_allocation!
 # Load selection algorithms
 include("selection.jl")
 export trivial_selection!, uniform_selection!,
-    optimal_selection!, targeted_selection!, repopulate!
+    optimal_selection!, targeted_selection!, repopulate!,
+    static_selection!
 # Load coarse model algorithms
 include("coarse_serial.jl")
 include("coarse_parallel.jl")
