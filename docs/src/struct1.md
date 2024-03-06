@@ -1,6 +1,6 @@
 # Data Structures for Weighted Ensemble
-
-```@docs
+TBW
+<!-- ```@docs
 Ensemble
 Bins
-```
+``` -->

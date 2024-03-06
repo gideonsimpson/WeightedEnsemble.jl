@@ -1,6 +1,6 @@
 # Weighted Ensemble Methods
-
-## Serial Algorithms
+TBW 
+<!-- ## Serial Algorithms
 ```@docs
 run_we
 run_we_observables
@@ -19,4 +19,4 @@ prun_we!
 trun_we
 trun_we_observables
 trun_we!
-```
+``` -->
