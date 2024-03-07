@@ -15,5 +15,5 @@ makedocs(checkdocs=:none,
                 "Weighted Ensemble Methods" => "we1.md"
                ])
 deploydocs(;
-    repo="github.com/liamfdoherty/WeightedEnsemble.jl",
+    repo="github.com/gideonsimpson/WeightedEnsemble.jl",
 )

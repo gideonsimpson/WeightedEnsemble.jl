@@ -1,9 +1,27 @@
 # Particle Selection Algorithms
-TBW
-<!-- ```@docs
-trivial_selection!
-repopulate!
+
+```@docs
 uniform_selection!
+```
+
+```@docs
 optimal_selection!
+```
+
+```@docs
 targeted_selection!
-``` -->
+```
+
+```@docs
+static_selection!
+```
+
+
+```@docs
+trivial_selection!
+```
+
+```@docs
+repopulate!
+```
+

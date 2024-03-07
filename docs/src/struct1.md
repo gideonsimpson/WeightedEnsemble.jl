@@ -17,3 +17,8 @@ description thus far; at each ``t``, it holds the information about ``\{(\omega_
 Bins
 ```
 
+## Samplers
+```@docs
+WEsampler
+```
+

@@ -1,6 +1,6 @@
 # WE routines
 
-""" `run_we`: Run a serial WE simulation, optionally returning the ensemble at
+""" `run_we(E₀, B₀, sampler, n_we_steps; n_save_iters = 1)`: Run a serial WE simulation, optionally returning the ensemble at
 each, step with
 
 ### Arguments
