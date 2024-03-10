@@ -1,9 +1,9 @@
 
 
 """
-`Ensemble{TP, TF<:AbstractFloat, TI<:Integer, TD}`: A particle ensemble structure
-designed for WE with bins.
+    Ensemble{TP, TF<:AbstractFloat, TI<:Integer, TD}
 
+A particle ensemble structure designed for WE with bins.
 ### Fields
 
 * `ξ̂` - particle positions after selection, before mutation

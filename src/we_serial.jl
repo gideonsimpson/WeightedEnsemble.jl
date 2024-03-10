@@ -1,8 +1,10 @@
 # WE routines
 
-""" `run_we(E₀, B₀, sampler, n_we_steps; n_save_iters = 1)`: Run a serial WE simulation, optionally returning the ensemble at
-each, step with
+"""
+    run_we(E₀, B₀, sampler, n_we_steps; n_save_iters = 1) 
 
+Run a serial WE simulation, optionally returning the ensemble at
+each, step with
 ### Arguments
 * `E₀` - initial particle ensemble
 * `B₀` - initial bin data structure
@@ -43,10 +45,11 @@ end
 
 
 
-""" 
-`run_we_observables`: Run a serial WE simulation, returning the values a
-specified fucntion, `f`, along the trajecotry.
+"""
+    run_we_observables(E₀, B₀, sampler, n_we_steps, observables)
 
+Run a serial WE simulation, returning the values a specified fucntion, `f`,
+along the trajecotry.
 ### Arguments
 * `E₀` - initial particle ensemble
 * `B₀` - initial bin data structure
@@ -82,8 +85,9 @@ end
 
 
 """
-`run_we!`: Run an in place serial WE simulation with
+    run_we!(E, B, sampler, n_we_steps)
 
+Run an in place serial WE simulation with
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure

@@ -1,11 +1,10 @@
 # Utility Functions
-TBW
-<!-- ```@docs
+
+Some additional functions have been provided that, while they are not directly  used, may be of use to the user.
+
+```@docs
 WeightedEnsemble.update_bin_weights!
-WeightedEnsemble.Points_to_Bins
-WeightedEnsemble.Voronoi_to_Bins
-WeightedEnsemble.Voronoi_bin_id
-WeightedEnsemble.setup_Voronoi_bins
-WeightedEnsemble.Dirac_to_Ensemble
 WeightedEnsemble.trivial_analysis!
-``` -->
+WeightedEnsemble.Voronoi_bin_id
+repopulate!
+```

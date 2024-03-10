@@ -1,7 +1,8 @@
 
 """
-`Bins{TS, TW, TBI, TT}`: A bin structure designed for WE
+    Bins{TS, TW, TBI, TT}
 
+A bin structure designed for WE
 ### Fields
 
 * `Ω` - structure containing information for uniquely identifying each bin

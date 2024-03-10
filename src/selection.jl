@@ -1,6 +1,7 @@
 """
-`trivial_selection!(E)`: Trivial selection, copying over particles
+    trivial_selection!(E)
 
+Trivial selection, copying over particles
 ### Arguments
 * `E` - particle ensemble
 """
@@ -14,13 +15,14 @@ function trivial_selection!(E::TE) where {TE<:Ensemble}
 end
 
 """
-`repopulate!(E, B)`: After allocating the number of offspring of each particle, copy
-the particles over.
+    repopulate!(E, B) 
 
+After allocating the number of offspring of each particle, copy the particles
+over.  If the number of allocated particles is < N, the remaining particles are
+assigned zero weight.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
-### Optional Arguments
 """
 function repopulate!(E::TE, B::TB) where {TE<:Ensemble,TB<:Bins}
 
@@ -60,9 +62,10 @@ function repopulate!(E::TE, B::TB) where {TE<:Ensemble,TB<:Bins}
 end
 
 """
-`uniform_selection!(E, B, t)`: Uniformly select particles, ensuring each bin with
-positive bin weight has at least one offspring.
+    uniform_selection!(E, B, t; allocation_resampler=systematic, within_bin_resampler=multinomial, νmin=νmin)
 
+Uniformly select particles, ensuring each bin with positive bin weight has at
+least one offspring.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
@@ -105,9 +108,10 @@ function uniform_selection!(E::TE, B::TB, t::Int; allocation_resampler=systemati
 end
 
 """
-`optimal_selection!(E, B, v², t)`: Perform optimal selection of the particles, ensuring each
-non empty bin has at least one particle.
+    optimal_selection!(E, B, v², t; allocation_resampler=systematic, within_bin_resampler=multinomial, νmin=νmin))
 
+Perform optimal selection of the particles, ensuring each non empty bin has at
+least one particle.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
@@ -150,13 +154,14 @@ function optimal_selection!(E::TE, B::TB, v²::F, t::Int; allocation_resampler=s
 end
 
 """
-`targeted_selection!`: Perform targeted selection of the particles, ensuring each
-non empty bin has at least one particle.
+    targeted_selection!(E, B, G, t; ; allocation_resampler=systematic, within_bin_resampler=multinomial, νmin=νmin))
 
+Perform targeted selection of the particles, ensuring each non empty bin has at
+least one particle.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
-* `G` - target function
+* `G(p, E, B, t)` - target function, applied to bin index `p`
 * `t` - t-th seletion step
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
@@ -195,10 +200,9 @@ function targeted_selection!(E::TE, B::TB, G::F, t::Int; allocation_resampler=sy
 end
 
 """
-`static_selection!(E, B, n_static, t)`: Select particles according to a static
-allocation rule.  If the number of allocated particles is < N, the remaining
-particles are assigned zero weight.
+    static_selection!(E, B, n_static, t; within_bin_resampler=multinomial, νmin=νmin)
 
+Select particles according to a static allocation rule.  
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure

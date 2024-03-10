@@ -1,11 +1,12 @@
 """
-`Residual`: perform residual sampling
+    residual(n,ω)
 
+Perform residual sampling
 ### Arguments
-`n` - number of trials
-`ω` - probabilities
+* `n` - number of trials
+* `ω` - probabilities
 """
-function Residual(n,ω)
+function residual(n,ω)
 
     m = length(ω);
 
@@ -24,11 +25,12 @@ function Residual(n,ω)
 end
 
 """
-`stratified`: perform stratified sampling
+    stratified(n,ω)
 
+Perform stratified sampling
 ### Arguments
-`n` - number of trials
-`ω` - probabilities
+* `n` - number of trials
+* `ω` - probabilities
 """
 function stratified(n,ω)
     U = range(0,stop=n-1)/n .+ rand(n)/n;
@@ -39,11 +41,12 @@ function stratified(n,ω)
 end
 
 """
-`systematic`: perform systematic sampling
+    systematic(n,ω)
 
+Perform systematic sampling
 ### Arguments
-`n` - number of trials
-`ω` - probabilities
+* `n` - number of trials
+* `ω` - probabilities
 """
 function systematic(n,ω)
 
@@ -55,11 +58,12 @@ function systematic(n,ω)
 end
 
 """
-`multinomial`: perform multinomial sampling
+    multinomial(n, ω)
 
+Perform multinomial sampling
 ### Arguments
-`n` - number of trials
-`ω` - probabilities
+* `n` - number of trials
+* `ω` - probabilities
 """
 function multinomial(n, ω)
 

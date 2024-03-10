@@ -1,9 +1,10 @@
 # WE routines
 
-""" 
-`trun_we`: Run a multithreaded WE simulation, optionally returning the
-ensemble at each, step with
+"""
+    trun_we(E₀, B₀, sampler, n_we_steps; n_save_iters = 1)
 
+Run a multithreaded WE simulation, optionally returning the
+ensemble at each, step with
 ### Arguments
 * `E₀` - initial particle ensemble
 * `B₀` - initial bin data structure
@@ -50,10 +51,11 @@ function trun_we(E₀::TE, B₀::TB, sampler::TWES, n_we_steps::Int; n_save_iter
 end
 
 
-""" 
-`trun_we_observables`: Run a multithreaded WE simulation, returning the values a
-specified fucntions, `observables`, along the trajecotry.
-
+"""
+    trun_we_observables(E₀, B₀, sampler, n_we_steps, observables)
+ 
+Run a multithreaded WE simulation, returning the values a specified fucntions,
+`observables`, along the trajecotry.
 ### Arguments
 * `E₀` - initial particle ensemble
 * `B₀` - initial bin data structure
@@ -92,8 +94,9 @@ function trun_we_observables(E₀::TE, B₀::TB, sampler::TWES, n_we_steps::Int,
 end
 
 """
-`trun_we!`: Run an in place multithreaded WE simulation with
+    trun_we!(E, B, sampler, n_we_steps)
 
+Run an in place multithreaded WE simulation with
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure

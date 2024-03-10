@@ -27,9 +27,9 @@ to be able to simulate the associated process, i.e., sample a Markov kernel,
 this approach is in the computation of mean first passage times (MFPTs) via the
 [Hill relation](https://statisticalbiophysicsblog.org/?p=8).
 
-This implementation of WE makes use of a fixed number, ``N``, particles, ``\xi^{i}``, each carrying weight ``\omega^{i}``.  At algorithmic time ``t=0``, we denote
+This implementation of WE makes use of a fixed number, ``N``, particles, ``\xi^{i}``, each carrying weight ``\omega^{i}``.  At algorithmic time ``t``, we denote
 ```math
-\mu_0^{N}(dx) = \sum_{i=1}^N \omega_0^{i}\delta_{\xi_0^{i}}(dx)
+\mu_t^{N}(dx) = \sum_{i=1}^N \omega_t^{i}\delta_{\xi_t^{i}}(dx)
 ```
 The weights are assumed to be positive and sum to one.  The particle ensemble is
 stored in an [`Ensemble`](@ref) data structure. The ensemble is evolved,
@@ -42,7 +42,7 @@ distribution in such a way so as to maintain unbiasedness _and_ reduce variance
 with respect to some quantity of interest.  The ensemble after selection is
 represented by
 ```math
-\hat{\mu}_0^{N}(dx) = \sum_{i=1}^N \hat{\omega}_0^{i}\delta_{\hat{\xi}_0^{i}}(dx)
+\hat{\mu}_t^{N}(dx) = \sum_{i=1}^N \hat{\omega}_t^{i}\delta_{\hat{\xi}_t^{i}}(dx)
 ```
 
 ### Bins
@@ -86,14 +86,14 @@ allocation and selection with bins behaves as expected.
 ### Mutation
 During the mutation step, the particles evolve freely over one algorithmic time unit according to a user defined Markov kernel, ``K``, with ``\xi_{t+1}^{i}\sim K(\hat{\xi}_t^{i}, dx)``, and ``\omega_{t+1}^{i}= \hat{\omega}_t^{i}``.  We then have the updated ensemble,
 ```math
-\mu_t^{N}(dx) = \sum_{i=1}^N \omega_t^{i}\delta_{\xi_t^{i}}(dx)
+\mu_{t+1}^{N}(dx) = \sum_{i=1}^N \omega_{t+1}^{i}\delta_{\xi_{t+1}^{i}}(dx)
 ```
 
 ### Unbiasedness 
 Repeating the above alternating selection/mutation steps, the key feature of WE
 is as follows. Denote by ``\mu`` the invariant measure associated with the Markov kernel ``K`` such that ``\mu K=\mu``.  Additionally, suppose ``\omega_0^{i}=1/N`` and ``\xi_0^{i}\sim \mu_0`` be i.i.d.  Lastly, denote by ``\mu_t = \mu_0 K^t``.  Then for any observable ``f``,
 ```math
-\mu_t(f)=\mathbb{E}_{\mu_t}[f(X)] = \mathbb{E}[\mu_t^{N}(f)]= \mathbb{E}[\hat{\mu}_t^{N}(f)],
+\mu_t(f)=\mathbb{E}_{\mu_0}[f(X_t)] = \mathbb{E}[\mu_t^{N}(f)]= \mathbb{E}[\hat{\mu}_t^{N}(f)],
 ```
 where the latter two expectations are ensemble averages over the WE process.  Consequently, WE is _unbiased_, and it is providing $N$-particle approximations of the distribution, ``\mu_t``.
 
@@ -153,5 +153,9 @@ This work was supported in part by the US National Science Foundation Grants DMS
  4.  Webber, R. J., Aristoff, D., & Simpson, G. A splitting method to reduce MCMC variance. arXiv:2011.13899 (2020)
  5.  Aristoff, D. & Zuckerman, D. M. Optimizing Weighted Ensemble Sampling of Steady States. Multiscale Model. Simul. 18, 646–673 (2020).
  6.  Huber, G. A. & Kim, S. Weighted-ensemble Brownian dynamics simulations for protein association reactions. Biophysical Journal 70, 97–110 (1996).
+ 7.  Douc, R. & Cappe, O. Comparison of resampling schemes for particle filtering. in ISPA 2005. Proceedings of the 4th International Symposium on Image and Signal Processing and Analysis, 2005. 64–69 (IEEE, Zagreb, Croatia, 2005). doi:10.1109/ISPA.2005.195385.
 
- 
+## Index
+```@index
+```
+

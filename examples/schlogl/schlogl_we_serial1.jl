@@ -33,7 +33,7 @@ n_particles = 10^2;
 
 # define bin structure
 voronoi_pts = [[x] for x in 5:5:100];
-B₀ = WeightedEnsemble.Voronoi_to_Bins(voronoi_pts);
+B₀ = WeightedEnsemble.Points_to_Bins(voronoi_pts);
 tree = KDTree(hcat(float.(voronoi_pts)...));
 
 # define bin id mapping
