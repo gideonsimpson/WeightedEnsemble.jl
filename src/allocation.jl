@@ -1,7 +1,8 @@
 
 """
-`trivial_allocation!`: Trivially allocate each particle to have one offspring.
+    trivial_allocation!(E, B)
 
+Trivially allocate each particle to have one offspring.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure
@@ -13,12 +14,14 @@ function trivial_allocation!(E::TE, B::TB) where {TE<:Ensemble,TB<:Bins}
 end
 
 """
-`minimal_bin_allocation!`: Allocates a single particle to be spawned within each
-nonempty bin and the current number of particles in any bin with less than νmin
-total mass.
+    minimal_bin_allocation!(B; νmin=νmin)
 
+Allocates a single particle to be spawned within each nonempty bin and the
+current number of particles in any bin with less than νmin total mass.
 ### Arguments
 * `B` - bin data structure
+### Optional Arguments
+* `νmin=νmin` - minimal bin weight to avoid underflow
 """
 function minimal_bin_allocation!(B::TB; νmin=νmin) where {TB<:Bins}
 
@@ -33,16 +36,19 @@ function minimal_bin_allocation!(B::TB; νmin=νmin) where {TB<:Bins}
 
    B
 end
+
 """
-    static_bin_allocation!(B::TB, static_allocate::Vector{Int}; νmin=νmin) where {TB<:Bins}
+    static_bin_allocation!(B, n_static; ωmin=ωmin)
 
 Allocates a predeterimined number of particles to be spawned within each
-nonempty bin and the current number of particles in any bin with less than νmin
-total mass.
+nonempty bin and the current number of particles in any bin, provided no
+particle would be given less than a specified minimal mass.
 
 ### Arguments
 * `B` - bin data structure
 * `n_static` - array of predetermined bin allocation numbers
+### Optional Arguments
+* `ωmin=ωmin` - minimal particle weight to avoid underflow
 """
 function static_bin_allocation!(B::TB, n_static::Vector{Int}; ωmin=ωmin) where {TB<:Bins}
 
@@ -53,11 +59,10 @@ function static_bin_allocation!(B::TB, n_static::Vector{Int}; ωmin=ωmin) where
 end
 
 """
-`targeted_bin_allocation!`: Targeted allocation of particles amongst bins using
-a specified function, `G:(p, E, B, t) → [0,∞)` for bin `p`. Falls back to
-uniform allocation amongst the non-empty bins in the event that this `G` fails
-to normalize.
+    targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; allocation_resampler=systematic, νmin=νmin) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
+Targeted allocation of particles amongst bins using a specified function, `G:(p,
+E, B, t) → [0,∞)` for bin `p`.
 ### Arguments
 * `B` - bin data structure
 * `E` - particle ensemble
@@ -66,6 +71,7 @@ to normalize.
 * `n_allocate` - number of particles to allocate
   ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
+* `νmin=νmin` - minimal bin weight to avoid underflow
 """
 function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; allocation_resampler=systematic, νmin=νmin) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
@@ -89,9 +95,10 @@ function targeted_bin_allocation!(B::TB, E::TE, G::F, t::Int, n_allocate::Int; a
 end
 
 """
-`optimal_bin_allocation!`: Optimally particles according to the bins,
-using a value function to approximate mutation variance.
+    optimal_bin_allocation!(B, E, v², t, n_allocate; allocation_resampler=systematic, νmin=νmin)
 
+Optimally particles according to the bins, using a value function, `v²` to approximate
+mutation variance.
 ### Arguments
 * `B` - bin data structure
 * `E` - particle ensemble
@@ -100,6 +107,7 @@ using a value function to approximate mutation variance.
 * `n_allocate` - number of particles to allocate 
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
+* `νmin=νmin` - minimal bin weight to avoid underflow
 """
 function optimal_bin_allocation!(B::TB, E::TE, v²::F, t::Int, n_allocate::Int; allocation_resampler=systematic, νmin=νmin) where {TE<:Ensemble,TB<:Bins,F<:Function}
 
@@ -115,14 +123,16 @@ function optimal_bin_allocation!(B::TB, E::TE, v²::F, t::Int, n_allocate::Int; 
 end
 
 """
-`uniform_bin_allocation!`: Uniformly allocate particles amongst bins.
+    uniform_bin_allocation!(B, E, n_allocate; allocation_resampler=systematic, νmin=νmin)
 
+Uniformly allocate particles amongst bins.
 ### Arguments
 * `B` - bin data structure
 * `E` - particle ensemble
 * `n_allocate` - number of particles to allocate
 ### Optional Arguments
 * `allocation_resampler=systematic` - resampling scheme amongst bins
+* `νmin=νmin` - minimal bin weight to avoid underflow
 """
 function uniform_bin_allocation!(B::TB, E::TE, n_allocate::Int; allocation_resampler=systematic, νmin=νmin) where {TE<:Ensemble,TB<:Bins}
    G = (p, E, B, t) -> 1.0
@@ -131,10 +141,11 @@ function uniform_bin_allocation!(B::TB, E::TE, n_allocate::Int; allocation_resam
 end
 
 """
-`within_bin_allocation!`: Once the number of offspring within each bin are set,
-allocate them amongst the particles within the bin.  This assumes that the bin
-allocations of the bins have completed.
+    within_bin_allocation!(E, B; within_bin_resampler=multinomial)
 
+Once the number of offspring within each bin are set, allocate them amongst the
+particles within the bin.  This assumes that the bin allocations of the bins
+have completed.
 ### Arguments
 * `E` - particle ensemble
 * `B` - bin data structure

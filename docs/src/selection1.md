@@ -1,12 +1,11 @@
-# Particle Selection Algorithms
+# Selection
 
 ```@contents
 Pages = ["selection1.md"]
-Depth = 2
 ```
 
 
-## More about the Selection Step
+## Details of the Selection Step
 The selection step, encoded in a user defined `selection!` function, is the
 essential element of WE.  It is designed to ensure that the results of WE are
 unbiased _and_ work to reduce the variance of some QoI.  
@@ -31,11 +30,19 @@ typically includes the following two conditions:
   ```
   This is neccessary to avoid floating point underflow issues.
   
-These steps are both handled by `minimal_bin_allocation!(E, B)`.  After this
+These steps are both handled by [`minimal_bin_allocation!(E, B)`](@ref).  After this
 step is completed, the remaining  particles are allocated to the bins, then
 particles are allocated within each bin, and, finally, [`repopulate!(E, B)`](@ref) is
-called, which assigns ``\{(\hat{\omega}_t^i, \hat{\xi}_t^i\}``, storing them in
+called, which assigns ``\{(\hat{\omega}_t^i, \hat{\xi}_t^i)\}``, storing them in
 `E.ξ̂` and `E.ω̂`.
+
+Indeed, the typical user defined selection step is the composition of some
+number of allocation steps, discussed in [`Allocation`](@ref), which determine
+the target number of particles within each bin, and the, within each bin, target
+number of offspring of each particle.  This is followed by the
+[`repopulate!`](@ref) step, which actually duplicates particles as appropriate.
+We have included several resampling schemes that are invoked by the allocation
+functions; see  [`Resampling`](@ref).
 
 As several of the included selection routines show, one may include additional
 arguments.  But when the `selection!` step is used to define a
