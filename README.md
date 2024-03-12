@@ -1,4 +1,7 @@
 # WeightedEnsemble
+
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://gideonsimpson.github.io/WeightedEnsemble.jl/dev)
+
 Julia Implementation of the Weighted Ensemble Algorithm
 
 # Overview
