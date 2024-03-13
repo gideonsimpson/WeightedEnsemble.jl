@@ -1,4 +1,4 @@
-# Resampling
+# Resampling Algorithms
 
 As it is neccessary to perform resampling, both for determining how many
 offspring each bin should have, and, having determined that, resampling the

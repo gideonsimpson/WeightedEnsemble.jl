@@ -1,4 +1,4 @@
-# Selection
+# Selection Algorithms
 
 ```@contents
 Pages = ["selection1.md"]
@@ -37,12 +37,12 @@ called, which assigns ``\{(\hat{\omega}_t^i, \hat{\xi}_t^i)\}``, storing them in
 `E.ξ̂` and `E.ω̂`.
 
 Indeed, the typical user defined selection step is the composition of some
-number of allocation steps, discussed in [`Allocation`](@ref), which determine
+number of allocation steps, discussed in [Allocation Algorithms](@ref), which determine
 the target number of particles within each bin, and the, within each bin, target
 number of offspring of each particle.  This is followed by the
 [`repopulate!`](@ref) step, which actually duplicates particles as appropriate.
 We have included several resampling schemes that are invoked by the allocation
-functions; see  [`Resampling`](@ref).
+functions; see  [Resampling Algorithms](@ref).
 
 As several of the included selection routines show, one may include additional
 arguments.  But when the `selection!` step is used to define a

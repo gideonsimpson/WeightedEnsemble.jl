@@ -1,2 +1,5 @@
 [deps]
+BasicMD = "f448d96e-cc9b-4179-976a-6795f3ef2db6"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+TestLandscapes = "acebfb02-3096-4040-86f5-d41b0f19d497"
