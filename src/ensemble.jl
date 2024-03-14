@@ -97,3 +97,67 @@ end
 function Base.isempty(E::TE) where {TE<:AbstractEnsemble}
    return isempty(E.ξ)
 end
+
+"""
+    Ensemble(X, n_particles)
+
+Construct an ensemble of `n_particles` with all particles in the state `X` with
+uniform weights.
+### Arguments
+* `X` - state to be assigned to all particles
+* `n_particles` - size of ensemble
+"""
+function Ensemble(X::TP, n_particles::TI) where {TP, TI<:Integer}
+   ω = 1.0 / n_particles
+   E = Ensemble{TP,Float64,TI, Nothing}([deepcopy(X) for _ in 1:n_particles],
+      [deepcopy(X) for _ in 1:n_particles],
+      ω * ones(n_particles), ω * ones(n_particles),
+      zeros(TI, n_particles), zeros(TI, n_particles),
+      zeros(TI, n_particles),
+      [Nothing() for _ in 1:n_particles],
+      [Nothing() for _ in 1:n_particles])
+   return E
+end
+
+"""
+    Ensemble(X)
+
+Construct an ensemble with particles in the states specified in vector `X` with
+uniform weights.
+### Arguments
+* `X` - array of states at which to initialize the particles
+"""
+function Ensemble(X::Vector{TP}) where {TP}
+   n_particles = length(X);
+   ω = 1.0 / n_particles
+   E = Ensemble{TP,Float64,Integer,Nothing}(deepcopy(X),
+      deepcopy(X),
+      ω * ones(n_particles), ω * ones(n_particles),
+      zeros(Integer, n_particles), zeros(Integer, n_particles),
+      zeros(Integer, n_particles),
+      [Nothing() for _ in 1:n_particles],
+      [Nothing() for _ in 1:n_particles])
+   return E
+end
+
+"""
+    Ensemble(X, ω)
+
+Construct an ensemble with particles in the states specified in vector `X` with
+ weights specified in vector `ω`
+### Arguments
+* `X` - array of states at which to initialize the particles
+* `ω` - array of weights at which to initialize the particles
+"""
+function Ensemble(X::Vector{TP}, ω::Vector{TF}) where {TP, TF<:AbstractFloat}
+   n_particles = length(X)
+   E = Ensemble{TP,Float64,Integer,Nothing}(deepcopy(X),
+      deepcopy(X), deepcopy(ω), deepcopy(ω),
+      zeros(Integer, n_particles), zeros(Integer, n_particles),
+      zeros(Integer, n_particles),
+      [Nothing() for _ in 1:n_particles],
+      [Nothing() for _ in 1:n_particles])
+   return E
+end
+
+
