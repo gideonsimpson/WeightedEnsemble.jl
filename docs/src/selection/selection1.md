@@ -54,7 +54,7 @@ selection! = (E, B, t) -> targeted_selection!(E, B, G, t);
 sampler = WEsampler(mutation!, selection!, rebin!); # mutation! and rebin! defined elsewhere
 ```
 
-## Included Selection Methods
+## Selection Methods
 
 ```@docs
 uniform_selection!

@@ -1,4 +1,4 @@
-# Mutation
+# [Mutation](@id mutation1)
 
 The mutation step is the user defined function corresponding to one step of a
 (time-independent) Markov chain, ``X_{k+1}\sim K(X_k,\bullet)``.  This should be

@@ -44,6 +44,8 @@ represented by
 ```math
 \hat{\mu}_t^{N}(dx) = \sum_{i=1}^N \hat{\omega}_t^{i}\delta_{\hat{\xi}_t^{i}}(dx)
 ```
+See [Selection Algorithms](@ref) and related documents for additional details on
+this step.
 
 ### Bins
 To understand more of how the selection step works, it is essential to introduce
@@ -88,6 +90,7 @@ During the mutation step, the particles evolve freely over one algorithmic time 
 ```math
 \mu_{t+1}^{N}(dx) = \sum_{i=1}^N \omega_{t+1}^{i}\delta_{\xi_{t+1}^{i}}(dx)
 ```
+See [Mutation](@ref mutation1) for additional information on implemenation.
 
 ### Unbiasedness 
 Repeating the above alternating selection/mutation steps, the key feature of WE

@@ -7,8 +7,9 @@ makedocs(checkdocs=:none,
          pages=[
                 "Home" => "index.md",
                 "Structures" => "struct1.md",
-                "Mutation" =>"mutation1.md",
-                "Selection" => ["selection1.md", "allocation1.md", "resampling1.md"],
+                "Mutation" =>"mutation/mutation1.md",
+                "Selection" => ["selection/selection1.md", 
+                "selection/allocation1.md", "selection/resampling1.md"],
                 "Coarse Modeling" => "coarse1.md",
                 "Utility Functions" => "util1.md",
                 "Weighted Ensemble Methods" => "we1.md"
