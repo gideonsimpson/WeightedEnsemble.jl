@@ -36,6 +36,9 @@ stored in an [`Ensemble`](@ref) data structure. The ensemble is evolved,
 successively, in two steps, _selection_ and _mutation_.  As the partilces and
 weights evolve in time, we add a ``t`` subscript to indicate that these quantities change, ``\{(\omega_t^{i},\xi_t^{i}\}``.
 
+This implementation has been used in [aristoff_weighted_2023, webber_splitting_2020](@cite).  It is heavily influenced by the algoirthmic
+description found in [aristoff_optimizing_2020](@cite).  
+
 ### Selection
 During the selection step, particles are resampled from the empirical
 distribution in such a way so as to maintain unbiasedness _and_ reduce variance
@@ -148,17 +151,4 @@ parallelize the selection step.
 
 ## Acknowledgements
 This work was supported in part by the US National Science Foundation Grants DMS-1818716 and DMS-2111278.
-
-## References
- 1.  Aristoff, D., Copperman, J., Simpson, G., Webber, R. J. & Zuckerman, D. M. Weighted ensemble: Recent mathematical developments. J. Chem. Phys. 158, 014108 (2023).
- 2.  Russo, J. D. et al. WESTPA 2.0: High-Performance Upgrades for Weighted Ensemble Simulations and Analysis of Longer-Timescale Applications. J. Chem. Theory Comput. 18, 638–649 (2022).
- 3.  Aristoff, D. An ergodic theorem for the weighted ensemble method. arXiv:1906.00856 (2021).
- 4.  Webber, R. J., Aristoff, D., & Simpson, G. A splitting method to reduce MCMC variance. arXiv:2011.13899 (2020)
- 5.  Aristoff, D. & Zuckerman, D. M. Optimizing Weighted Ensemble Sampling of Steady States. Multiscale Model. Simul. 18, 646–673 (2020).
- 6.  Huber, G. A. & Kim, S. Weighted-ensemble Brownian dynamics simulations for protein association reactions. Biophysical Journal 70, 97–110 (1996).
- 7.  Douc, R. & Cappe, O. Comparison of resampling schemes for particle filtering. in ISPA 2005. Proceedings of the 4th International Symposium on Image and Signal Processing and Analysis, 2005. 64–69 (IEEE, Zagreb, Croatia, 2005). doi:10.1109/ISPA.2005.195385.
-
-## Index
-```@index
-```
 

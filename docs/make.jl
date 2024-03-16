@@ -9,9 +9,18 @@ if abspath(PROGRAM_FILE) == @__FILE__
 end
 using WeightedEnsemble
 using Documenter
+using DocumenterCitations
+
+bib = CitationBibliography(joinpath(@__DIR__, "src", "refs.bib"); style=:numeric)
+
 makedocs(checkdocs=:none,
          sitename = "WeightedEnsemble.jl",
          modules  = [WeightedEnsemble],
+         format=Documenter.HTML(
+            # ...
+            assets=String["assets/citations.css"],
+            ),
+         plugins=[bib],
          pages=[
                 "Home" => "index.md",
                 "Structures" => "struct1.md",
@@ -21,7 +30,9 @@ makedocs(checkdocs=:none,
                 "Coarse Modeling" => "coarse1.md",
                 "Utility Functions" => "util1.md",
                 "Weighted Ensemble Methods" => "we1.md",
-                "Examples"=>["examples/equil1.md"]
+                "Examples"=>["examples/equil1.md"],
+                "References"=>"refs1.md",
+                "API"=>"api.md"
                ])
 deploydocs(;
     repo="github.com/gideonsimpson/WeightedEnsemble.jl",

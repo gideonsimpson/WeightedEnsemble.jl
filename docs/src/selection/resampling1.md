@@ -3,7 +3,7 @@
 As it is neccessary to perform resampling, both for determining how many
 offspring each bin should have, and, having determined that, resampling the
 particles within each bin, we have provided several choices here.  These
-methods, and their properties, can be found in Douc et al. (2005).  The provided
+methods, and their properties, can be found in [douc_comparison_2005](@cite).  The provided
 `selection!` functions default to using [`WeightedEnsemble.systematic`](@ref)
 across bins and [`WeightedEnsemble.multinomial`](@ref) within bins.
 
