@@ -19,10 +19,10 @@ user defined bins,
 Having, computed this matrix, we next solve for the coarse scale discrepancy and one step
 mutation variance functions:
 ```math
-\begin{gather}
+\begin{gather*}
 (I - \tilde{K})\tilde{h} = \tilde{f} - \tilde{\mu}(\tilde{f})\\
 \tilde{v}^2(p) = \mathrm{Var}_{\tilde{K}_{p,\bullet}}(\tilde{h})
-\end{gather}
+\end{gather*}
 ```
 
 ## Serial Methods
