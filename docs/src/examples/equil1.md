@@ -5,6 +5,11 @@ of the sort commonly found in molecular dynamics and Bayesian inverse problems.
 
 
 ## Doublewell Potential
+```@contents
+Pages = ["equil1.md"]
+Depth = 3:4
+```
+
 As a first example, we will consider the classical double well potential,
 ```math
 V(x) = (x^2-1)^2
@@ -32,6 +37,7 @@ p = quadgk(f, -δ, δ)[1]/Z;
 While not the rarest of events, this will take a bit of effort to estimate with
 high confidence.  This will be estimated using WE with the associated QoI, ``1_A(x)``.
 
+### Defining the Mutation Step
 We will explore this landscape using the MALA approximation of overdamped
 Langevin dyanmics; thus, we build up the mutation step:
 ```@example 1
@@ -48,15 +54,17 @@ nΔt = 10; # number of fine time steps per coarse WE step
 opts = MDOptions(n_iters=nΔt);
 mutation! = x -> sample_trajectory!(x, sampler, options=opts); nothing
 ```
+### Defining the Observable
 We define our observable, the indicator function on the
 set ``A``:
 ```@example 1
 fA(x) = Float64(-δ<x[1]<δ); nothing
 ```
+### Defining the Bins
 Next, we select a set of bins based on a Voronoi tesselation of the real line:
 ```@example 1
 using WeightedEnsemble
-voronoi_pts = [[x_] for x_ in LinRange(-1.5, 1.5, 21)];
+voronoi_pts = [[x_] for x_ in LinRange(-1.5, 1.5, 13)];
 B0, bin_id, rebin! = setup_Voronoi_bins(voronoi_pts); nothing
 ```
 before defining the selection step, we will also set the number of particles, WE
@@ -81,35 +89,35 @@ Next, we can run and examine our results:
 using Statistics
 using Random # for reproducbility
 Random.seed!(100);
-f_trajectory = run_we_observables(E0, B0, uni_we_sampler, n_we_steps, (fA,))[:]
-@show mean(f_trajectory);
+f_uni_trajectory = run_we_observables(E0, B0, uni_we_sampler, n_we_steps, (fA,))[:]
+@show mean(f_uni_trajectory);
 ```
 Visualizing our computation:
 ```@example 1
 using Plots
 using Printf
-plot(1:n_we_steps, f_trajectory , yaxis=(:log10, [1e-6, :auto]),lw=2,label="WE Est.")
-plot!(1:n_we_steps, cumsum(f_trajectory) ./ (1:n_we_steps),lw=2, label="WE Time Avg.")
+plot(1:n_we_steps, f_uni_trajectory , yaxis=(:log10, [1e-6, :auto]),lw=2,label="WE Est.")
+plot!(1:n_we_steps, cumsum(f_uni_trajectory) ./ (1:n_we_steps),lw=2, label="WE Time Avg.")
 plot!(1:n_we_steps, p * ones(n_we_steps),lw=2,ls=:dash,color=:black, label="Exact")
 xlabel!("Iterate")
 ```
 This gives a fairly good estimate, and if we were to apply a burnin rule, discarding the first 25 over so iterates, the time average would be spot on, as shown by the following, naive, 95% confidence interval calculation.
 ```@example 1
 using HypothesisTests
-confint(OneSampleTTest(f_trajectory[26:n_we_steps]))
+confint(OneSampleTTest(f_uni_trajectory[26:n_we_steps]))
 ```
 
-### Visualizing the WE
+### Visualizing WE with Uniform Selection
 To get a good sense of why WE works, we can animate the empirical distribution
 as a function of time:
 ```@example 1
 Random.seed!(100);
-E_trajectory, _ = run_we(E0, B0, uni_we_sampler, n_we_steps);
+E_uni_trajectory, _ = run_we(E0, B0, uni_we_sampler, n_we_steps);
 
 xplt = LinRange(-1.5, 1.5,501); 
 hist_bins = LinRange(-1.5,1.5,31);
 
-we_anim = @animate for (t, E) in enumerate(E_trajectory)
+we_anim = @animate for (t, E) in enumerate(E_uni_trajectory)
     histogram([ξ_[1] for ξ_ in E.ξ], bins=hist_bins, 
         weights=E.ω, norm=:pdf, alpha=0.5, label="Weighted Ensemble", legend=:top)
     histogram!([ξ_[1] for ξ_ in E.ξ], bins=hist_bins,
@@ -138,15 +146,16 @@ correct distribution.
 
 
 
-### Comparison with Direct Computation
+### Comparison of Uniform WE with Direct Computation
 One might ask how it fares against having used the same amount of resources on
 the problem directly:
 ```@example 1
+Random.seed!(200)
 trivial_we_sampler = WEsampler(mutation!, (E, B, t)->trivial_selection!(E), rebin!);
 f_direct_trajectory = run_we_observables(E0, B0, trivial_we_sampler, n_we_steps, (fA,))[:];
 
-plot(1:n_we_steps, f_trajectory ,yaxis=(:log10, [1e-6, :auto]),lw=2,label="WE Est.")
-plot!(1:n_we_steps, cumsum(f_trajectory) ./ (1:n_we_steps),lw=2, label="WE Time Avg.")
+plot(1:n_we_steps, f_uni_trajectory ,yaxis=(:log10, [1e-6, :auto]),lw=2,label="WE Est.")
+plot!(1:n_we_steps, cumsum(f_uni_trajectory) ./ (1:n_we_steps),lw=2, label="WE Time Avg.")
 plot!(1:n_we_steps, f_direct_trajectory , yscale=:log10,lw=2,label="Direct Est.")
 plot!(1:n_we_steps, cumsum(f_direct_trajectory) ./ (1:n_we_steps),lw=2, label="Direct Time Avg.")
 plot!(1:n_we_steps, p * ones(n_we_steps),lw=2,ls=:dash,color=:black, label="Exact")
@@ -158,6 +167,58 @@ line labeled `Direct Est.` appears to stop is because it is returning zeros
 which are not showing up on the logarithmic scale.
 
 ### Optimal Selection
-TBW
+To perform Optimal Selection, in the spirit of
+[aristoff_optimizing_2020](@cite), we must first approximate
+```math
+v^2(x) = \mathrm{Var}_{K(x,\bullet)}(h)
+```
+where ``K`` is our Markov transition kernel, and ``h`` is the solution of the
+Poisson problem
+```math
+(I - K)h = f - \mu(f)
+```
+An approximation is found by first estimating coarse, bin scale, transition, matrix ``\tilde{K}``, where
+```math
+\tilde{K}_{pq} \approx \mathbb{P}(p\to q),
+```
+the probability of a particle starting in bin ``p`` transitioning to bin ``q``.
+Left unsaid is what hte initial distribution is for the particles; in practice,
+we often use a Dirac (centered at the Voronoi cell center).  This matrix is
+estimated using our coarse model tools (see [Coarse Models](@ref)):
+```@example 1
+x0_vals = deepcopy(voronoi_pts); # Dirac at the bin
+n_bins = length(B0);
+n_samples_per_bin = 10^3;
 
+Random.seed!(5000)
+K̃ = WeightedEnsemble.build_coarse_transition_matrix(mutation!, bin_id,
+    x0_vals, n_bins, n_samples_per_bin);
+```
+Having constructed this, we now obtain the coarse, bin scale, approximation of
+``v^2``.  This requires us to first construct a bin function approximation of
+the observable, then compose it with the bin identification function, ``\tilde{f}_A``.
+```@example 1
+f̃A = fA.(voronoi_pts); # bin function for 
+h̃, ṽ² = WeightedEnsemble.build_coarse_poisson(K̃, f̃A);
+v² = (x, t) -> ṽ²[bin_id(x)]; nothing
+```
+We are now ready to run the optimized sampler:
+```@example 1
+optimal! = (E, B, t) -> optimal_selection!(E, B, v², t);
+opt_we_sampler = WEsampler(mutation!, optimal!, rebin!);
+Random.seed!(300)
+f_opt_trajectory = run_we_observables(E0, B0, opt_we_sampler, n_we_steps, (fA,))[:];
 
+plot(1:n_we_steps, f_uni_trajectory ,yaxis=(:log10, [1e-6, :auto]),lw=2,label="WE Est.")
+plot!(1:n_we_steps, cumsum(f_uni_trajectory) ./ (1:n_we_steps),lw=2, label="WE Time Avg.")
+plot!(1:n_we_steps, f_opt_trajectory , yscale=:log10,lw=2,label="Optimal WE Est.")
+plot!(1:n_we_steps, cumsum(f_opt_trajectory) ./ (1:n_we_steps),lw=2, label="Optimal WE Time Avg.")
+plot!(1:n_we_steps, p * ones(n_we_steps),lw=2,ls=:dash,color=:black, label="Exact")
+xlabel!("Iterate")
+```
+The difference in this example is neglible to the eye, though when we check the variance (after burnin), we do see an improvement:
+```@example 1
+println(var(f_opt_trajectory[26:end]));
+println(var(f_uni_trajectory[26:end]));
+```
+More substantial improvements can be found in other problems, such as those shown in [aristoff_weighted_2023](@cite).

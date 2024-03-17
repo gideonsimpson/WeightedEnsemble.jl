@@ -1,8 +1,9 @@
 # routines for assembling a coarse model
 
 """
-`build_coarse_transition_matrix`: Contruct a transition matrix amongst the bins (serial version).
+    build_coarse_transition_matrix(mutation!, bin_id, x0_vals, n_bins, n_trials)
 
+Contruct a transition matrix amongst the bins (serial version).
 ### Arguments
 * `mutation!` - an in place mutation function
 * `bin_id` - bin identification function
@@ -37,10 +38,11 @@ function build_coarse_transition_matrix(mutation!, bin_id, x0_vals, n_bins, n_tr
 end
 
 """
-`build_coarse_vectors`: Assemble the conditional expectation and 1- step
-variance approximations on a coarser model, given the transition matrix, `K̃`,
-and a coarse scale QoI function, `f̃`.
+    build_coarse_vectors(n_we_steps, K̃, f̃)
 
+Assemble the conditional expectation and 1- step variance approximations on a
+coarse model, given the transition matrix, `K̃`, and a coarse scale QoI
+function, `f̃`.
 ### Arguments
 * `n_we_steps` - number of WE steps
 * `K̃` - coarse scale transition matrix
@@ -74,10 +76,11 @@ end
 
 
 """
-`build_coarse_poisson`: Construct the solution to the Poisson problem and the
-1-step variance approximation on the coarser model given the transition matrix,
-`K̃`, and a coarse scale QoI function, `f̃`.  This solves it using Julia's
-linear solver.
+    build_coarse_poisson(K̃, f̃)
+
+Construct the solution to the Poisson problem and the 1-step variance
+approximation on the coarser model given the transition matrix, `K̃`, and a
+coarse scale QoI function, `f̃`.  This solves it using Julia's linear solver.
 
 ### Arguments
 * `K̃` - coarse scale transition matrix
