@@ -6,6 +6,8 @@ using LinearAlgebra
     @test include("structures/ensemble1.jl")
     @test include("structures/ensemble2.jl")
     @test include("structures/ensemble3.jl")
+    @test include("structures/bins1.jl")
+    @test include("structures/bins2.jl")
 end
 
 @testset "Utilities" begin
