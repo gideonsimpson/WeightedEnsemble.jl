@@ -217,7 +217,7 @@ for (j,E) in enumerate(E_uni_trajectory)
 end
 
 plot(1:n_we_steps, f_uni_trajectory,  lw=2,yaxis=(:log10, [1e-8, :auto]),label="WE Est.")
-plot!(1:n_we_steps, cumsum(f_uni_trajectory) ./(1:n_we_steps), label="WE Time Avg.")
+plot!(1:n_we_steps, cumsum(f_uni_trajectory) ./(1:n_we_steps),lw=2, label="WE Time Avg.")
 plot!(1:n_we_steps, Δt / MFPT * ones(n_we_steps),
     lw=2,label="Δt/MFPT", color=:black, ls=:dash)
 xlabel!("Iterate")
@@ -233,9 +233,9 @@ trivial_we_sampler = WEsampler(mutation!, (E, B, t)->trivial_selection!(E), rebi
 f_direct_trajectory = run_we_observables(E0, B0, trivial_we_sampler, n_we_steps, (fB,))[:];
 
 plot(1:n_we_steps, f_uni_trajectory,  lw=2,yaxis=(:log10, [1e-8, :auto]), label="WE Est.")
-plot!(1:n_we_steps, cumsum(f_uni_trajectory) ./(1:n_we_steps), label="WE Time Avg.")
-plot!(1:n_we_steps, f_direct_trajectory, label="Direct Est.")
-plot!(1:n_we_steps, cumsum(f_direct_trajectory) ./(1:n_we_steps), label="Direct Time Avg.")
+plot!(1:n_we_steps, cumsum(f_uni_trajectory) ./(1:n_we_steps),lw=2, label="WE Time Avg.")
+plot!(1:n_we_steps, f_direct_trajectory, lw=2, label="Direct Est.")
+plot!(1:n_we_steps, cumsum(f_direct_trajectory) ./(1:n_we_steps),lw=2, label="Direct Time Avg.")
 plot!(1:n_we_steps, Δt / MFPT * ones(n_we_steps),
     lw=2,label="Δt/MFPT", color=:black, ls=:dash)
 xlabel!("Iterate")
