@@ -26,7 +26,8 @@ importance sampling will be needed.  This is precisely the regime where WE can
 pay off.  We will simulate the augmented process and estimate
 ``\mathbb{P}_\nu(B)`` using the we with the observable ``1_B(y)``.
 
-To connect this to the continuous time case, frequently of interest, let us assume that ``X_t`` follows overdamped Langevin dynamics
+To connect this to the continuous time case, frequently of interest, let us
+assume that ``X_t`` follows overdamped Langevin dynamics
 ```math
 dX_t = -\nabla V(X_t)dt + \sqrt{2\beta^{-1}}dW_t,
 ```
@@ -48,9 +49,13 @@ modified process obeys the nonlocal Fokker-Planck equation:
 \partial_t \rho = L^\ast ρ + \gamma_0(x)\int_{\partial B}J_{\rho}\cdot n dS.
 ```
 In the above expression, ``\int_{\partial B}J_{\rho}\cdot n dS`` is the
-integrated probability flux into the set ``B``.  This has an associated noequilibrium steady state distribution (NESS).
+integrated probability flux into the set ``B``.  This has an associated
+noequilibrium steady state distribution (NESS).
 
-To set this up to work with WE, we time discretize our process, ``\tilde{X}_{k}\approx X_{t_k}`` in some fashion and work with the associated augmented process (recylcing upon reaching ``B``), ``\tilde{Y}_k``.  The estimate of the MFPT of the original process is then
+To set this up to work with WE, we time discretize our process,
+``\tilde{X}_{k}\approx X_{t_k}`` in some fashion and work with the associated
+augmented process (recylcing upon reaching ``B``), ``\tilde{Y}_k``.  The
+estimate of the MFPT of the original process is then
 ```math
 \text{MFPT}\approx \frac{\Delta t}{\tilde{\nu}(B)}.
 ```
@@ -222,7 +227,10 @@ plot!(1:n_we_steps, Δt / MFPT * ones(n_we_steps),
     lw=2,label="Δt/MFPT", color=:black, ls=:dash)
 xlabel!("Iterate")
 ```
-We have a good estimate after 500 iterations.
+We have a good estimate after 500 iterations.  Note that the MFPT of the
+original continuous time process is ``\approx 25473``, but we simulated our WE
+process out to continuous time ``10`` (``10^3`` WE steps with ``\Delta t =
+10^{-2}``).
 
 ### Comparison with Direct Computation
 As in the equilibrium case, an attempt to estimate the MFPT via the Hill
