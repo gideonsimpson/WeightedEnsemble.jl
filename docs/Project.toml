@@ -1,5 +1,6 @@
 [deps]
 BasicMD = "f448d96e-cc9b-4179-976a-6795f3ef2db6"
+BoundaryValueDiffEq = "764a87c0-6b3e-53db-9096-fe964310641d"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 DocumenterCitations = "daee34ce-89f3-4625-b898-19384cb65244"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"

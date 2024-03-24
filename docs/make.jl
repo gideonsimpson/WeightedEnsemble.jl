@@ -30,7 +30,7 @@ makedocs(checkdocs=:none,
                 "Coarse Modeling" => "coarse1.md",
                 "Utility Functions" => "util1.md",
                 "Weighted Ensemble Methods" => "we1.md",
-                "Examples"=>["examples/equil1.md"],
+                "Examples" => ["examples/equil1.md", "examples/nonequil1.md"],
                 "References"=>"refs1.md",
                 "API"=>"api.md"
                ])

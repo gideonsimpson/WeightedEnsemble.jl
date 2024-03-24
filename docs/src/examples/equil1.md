@@ -4,7 +4,7 @@ These exmaples involve sampling from an equilibirum Boltzmann type distribution
 of the sort commonly found in molecular dynamics and Bayesian inverse problems.  
 
 
-## Doublewell Potential
+## [Doublewell Potential](@id double1)
 ```@contents
 Pages = ["equil1.md"]
 Depth = 3:4
