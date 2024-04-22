@@ -1,6 +1,8 @@
-n_particles = 100;
-x1 = [1.0];
-E1 = Ensemble(x1, n_particles);
-f1(x) = x[1];
+let
+    n_particles = 100;
+    x0 = [1.0];
+    E = Ensemble(x0, n_particles);
+    f(x) = x[1];
 
-E1.ω ⋅ f1.(E1.ξ) ≈ 1
+    E.ω ⋅ f.(E.ξ) ≈ 1
+end
