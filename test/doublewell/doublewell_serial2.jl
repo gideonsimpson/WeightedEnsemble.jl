@@ -7,9 +7,6 @@ let
     =#
 
     # include("doublewell_setup.jl");
-    using LinearAlgebra
-    using Random
-    using BasicMD
 
     function V(X)
         return (X ⋅ X - 1)^2
@@ -66,7 +63,7 @@ let
     # set up sampler - trivial analysis step
     we_sampler = WEsampler(mutation!, selection!, rebin!);
     # set up ensemble
-    E₀ = Dirac_to_Ensemble(x₀, n_particles);
+    E₀ = Ensemble(x₀, n_particles);
     rebin!(E₀, B₀, 0);
     # run
     E = deepcopy(E₀);

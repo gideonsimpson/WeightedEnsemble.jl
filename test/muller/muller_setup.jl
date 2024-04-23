@@ -14,7 +14,7 @@ using TestLandscapes: Muller
 ∇Muller! = (gradV, X) -> ForwardDiff.gradient!(gradV, Muller, X);
 
 # Identify minima for defining x₀ and target set B
-mins=[optimize(V, x) for x in [[-0.5, 1.5],[0., 0.5],[0.5, 0.]]];
+mins = [optimize(Muller, x) for x in [[-0.5, 1.5], [0.0, 0.5], [0.5, 0.0]]];
 x₀ = copy(mins[1].minimizer);   # initial point
 xt = copy(mins[3].minimizer);   # point defining target set B
 
