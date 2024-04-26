@@ -8,13 +8,8 @@ let
 
     # include("doublewell_setup.jl");
 
-    function V(X)
-        return (X ⋅ X - 1)^2
-    end
-    function gradV!(gradV, X)
-        @. gradV = 4.0 * (X^2 - 1) * X
-        gradV
-    end
+    V(x) = SymmetricDoubleWell(x[1])
+    ∇V! = (gradV, X) -> ForwardDiff.gradient!(gradV, V, X)
 
     a = -1.0   # starting point
     x₀ = [a]
@@ -27,7 +22,7 @@ let
     f = x -> Int(x[1] > b) # define observable
 
     # define sampler
-    sampler = MALA(V, gradV!, β, Δt)
+    sampler = MALA(V, ∇V!, β, Δt)
 
 
     # number of coarse steps in WE

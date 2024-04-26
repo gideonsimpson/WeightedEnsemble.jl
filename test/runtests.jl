@@ -5,7 +5,8 @@ using Random
 using BasicMD
 using ForwardDiff
 using Optim
-using TestLandscapes: Muller
+using Statistics
+using TestLandscapes: SymmetricDoubleWell, Muller
 
 @testset "Ensembles" begin
     @test include("structures/ensemble1.jl")
@@ -37,6 +38,9 @@ end
     @test include("doublewell/doublewell_single_serial2.jl")
     @test include("doublewell/doublewell_serial1.jl")
     @test include("doublewell/doublewell_serial2.jl")
+    @test include("doublewell/doublewell_serial3.jl")
+    @test include("doublewell/doublewell_serial4.jl")
+    @test include("doublewell/doublewell_noneq_serial1.jl")
 end
 
 @testset "Serial Muller" begin
