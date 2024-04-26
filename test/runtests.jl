@@ -33,6 +33,8 @@ end
 end
 
 @testset "Serial Doublewell" begin
+    @test include("doublewell/doublewell_single_serial1.jl")
+    @test include("doublewell/doublewell_single_serial2.jl")
     @test include("doublewell/doublewell_serial1.jl")
     @test include("doublewell/doublewell_serial2.jl")
 end
